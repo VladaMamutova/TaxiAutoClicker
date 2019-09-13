@@ -26,14 +26,14 @@ namespace TaxiAutoClicker
 
         private void LaunchAutoClicker_Click(object sender, RoutedEventArgs e)
         {
-            //if (string.IsNullOrEmpty(APIKeyTextBox.Text) ||
-            //    string.IsNullOrEmpty(Mail.Text) ||
-            //    string.IsNullOrEmpty(FirstName.Text) ||
-            //    string.IsNullOrEmpty(LastName.Text))
-            //{
-            //    MessageBox.Show("Заполните все поля.");
-            //    return;
-            //}
+            if (string.IsNullOrEmpty(APIKeyTextBox.Text) ||
+                string.IsNullOrEmpty(Mail.Text) ||
+                string.IsNullOrEmpty(FirstName.Text) ||
+                string.IsNullOrEmpty(LastName.Text))
+            {
+                MessageBox.Show("Заполните все поля.");
+                return;
+            }
 
             IntPtr[] windows = WindowManager
                 .FindWindowsWithText("NoxPlayer").ToArray();
@@ -105,10 +105,6 @@ namespace TaxiAutoClicker
 
             Thread.Sleep(1000);
 
-            // f2142B6fee88086849B527980709109f
-            // creativedeveloper0000@gmail.com
-            // Артём
-            // Ковальский
             VirtualKeyboard.PrintText(window, user.Mail);
             Thread.Sleep(1500);
             VirtualKeyboard.PressEnter();
@@ -235,17 +231,25 @@ namespace TaxiAutoClicker
 
             Thread.Sleep(15000);
 
-            // Место нахождения кнопки со стрелкой для раскрытия меню водителя
-            x = (int)((rect.Width - rect.X) * 0.937) + rect.X;
-            y = (int)((rect.Height - rect.Y) * 0.880) + rect.Y;
+            // Место нахождения иконки водителя для раскрытия его меню
+            x = (int)((rect.Width - rect.X) * 0.903) + rect.X;
+            y = (int)((rect.Height - rect.Y) * 0.893) + rect.Y;
             VirtualMouse.SendMouseMovement(new Point(x, y));
             VirtualMouse.SendMouseLeftClick(new Point(x, y));
 
             Thread.Sleep(1500);
 
-            // Место нахождения кнопки "Звонок" в меню водителя
-            x = (int)((rect.Height - rect.Y) * 0.12) + rect.X;
-            y = (int)((rect.Height - rect.Y) * 0.827) + rect.Y;
+            // Место нахождения кнопки "Звонить" в меню водителя
+            x = (int)((rect.Height - rect.X) * 0.194) + rect.X;
+            y = (int)((rect.Height - rect.Y) * 0.932) + rect.Y;
+            VirtualMouse.SendMouseMovement(new Point(x, y));
+            VirtualMouse.SendMouseLeftClick(new Point(x, y));
+
+            Thread.Sleep(500);
+
+            // Место нахождения кнопки с подтверждением звонка в меню водителя
+            x = (int)((rect.Height - rect.X) / 2) + rect.X;
+            y = (int)((rect.Height - rect.Y) * 0.842) + rect.Y;
             VirtualMouse.SendMouseMovement(new Point(x, y));
             VirtualMouse.SendMouseLeftClick(new Point(x, y));
 
@@ -253,50 +257,60 @@ namespace TaxiAutoClicker
 
             // Двойное нажатие на телефонный номер для его копирования
             x = (rect.Width - rect.X) / 2 + rect.X;
-            y = (int)((rect.Height - rect.Y) * 0.653) + rect.Y;
+            y = (int)((rect.Height - rect.Y) * 0.654) + rect.Y;
             VirtualMouse.SendMouseMovement(new Point(x, y));
             VirtualMouse.SendMouseDoubleClick(new Point(x, y));
 
             Thread.Sleep(1500);
 
-            // Нажатие на диспетчер задач
+            // Нажатие кнопки Домой
             x = rect.Width + 12;
-            y = (int)((rect.Height - rect.Y) * 0.97) + rect.Y;
+            y = (int)((rect.Height - rect.Y) * 0.92) + rect.Y;
             VirtualMouse.SendMouseMovement(new Point(x, y));
             VirtualMouse.SendMouseLeftClick(new Point(x, y));
 
             Thread.Sleep(1000);
 
-            // Открытие Bolt из диспетчера задач
-            x = (rect.Width - rect.X) / 2 + rect.X;
-            y = (int)((rect.Height - rect.Y) * 0.35) + rect.Y;
+            // Нажатие на иконку приложения Bolt на рабочем столе
+            x = (int)((rect.Width - rect.X) * 0.374) + rect.X;
+            y = (int)((rect.Height - rect.Y) * 0.384) + rect.Y;
             VirtualMouse.SendMouseMovement(new Point(x, y));
             VirtualMouse.SendMouseLeftClick(new Point(x, y));
 
             Thread.Sleep(3000);
 
+            // Место нахождения иконки водителя для раскрытия его меню
+            x = (int)((rect.Width - rect.X) * 0.903) + rect.X;
+            y = (int)((rect.Height - rect.Y) * 0.893) + rect.Y;
+            VirtualMouse.SendMouseMovement(new Point(x, y));
+            VirtualMouse.SendMouseLeftClick(new Point(x, y));
+
+            Thread.Sleep(1500);
+
             // Нажатие на кнопку отмены заказа в меню водителя.
-            x = (int)((rect.Width - rect.X) * 0.8616) + rect.Y;
-            y = (int)((rect.Height - rect.Y) * 0.8268) + rect.Y;
+            x = (int)((rect.Width - rect.X) * 0.803) + rect.X;
+            y = (int)((rect.Height - rect.Y) * 0.933) + rect.Y;
             VirtualMouse.SendMouseMovement(new Point(x, y));
             VirtualMouse.SendMouseLeftClick(new Point(x, y));
 
             Thread.Sleep(1000);
 
-            // Нажатие на кнопку отмены заказа во всплывающем уведомлении.
-            x = (rect.Width - rect.X) / 2 + rect.Y;
-            y = (int)((rect.Height - rect.Y) * 0.9635) + rect.Y;
+            // Нажатие на кнопку подтверждения отмены заказа
+            x = (int) ((rect.Width - rect.X) * 0.745) + rect.X;
+            y = (int) ((rect.Height - rect.Y) * 0.944) + rect.Y;
             VirtualMouse.SendMouseMovement(new Point(x, y));
             VirtualMouse.SendMouseLeftClick(new Point(x, y));
 
             Thread.Sleep(1000);
 
-            //// Выбор причины
-            int caseIndex = 0;
-            x = (rect.Width - rect.X) / 2 + rect.Y;
-            y = (int)((rect.Height - rect.Y) * 0.716) + rect.Y;
+            // Выбор причины
+            int reasonIndex = new Random().Next(0, 5);
+            int caseAbsolutePosition = 175 + 35 * reasonIndex; // (y=175 - первая причина на экране с h=768)
+            double caseRelativePosition = caseAbsolutePosition / 768.0;
+            x = (int) ((rect.Width - rect.X) / 2) + rect.X;
+            y = (int) ((rect.Height - rect.Y) * caseRelativePosition) + rect.Y;
             VirtualMouse.SendMouseMovement(new Point(x, y));
-            VirtualMouse.SendMouseLeftClick(new Point(x, y));
+            VirtualMouse.SendMouseLeftClick(new Point(x, y));         
         }
 
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
