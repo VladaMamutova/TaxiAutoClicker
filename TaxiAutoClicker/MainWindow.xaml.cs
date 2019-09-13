@@ -310,7 +310,61 @@ namespace TaxiAutoClicker
             x = (int) ((rect.Width - rect.X) / 2) + rect.X;
             y = (int) ((rect.Height - rect.Y) * caseRelativePosition) + rect.Y;
             VirtualMouse.SendMouseMovement(new Point(x, y));
-            VirtualMouse.SendMouseLeftClick(new Point(x, y));         
+            VirtualMouse.SendMouseLeftClick(new Point(x, y));
+            
+            // Очистка данных в настройках Bolt
+
+            // Нажатие кнопки Домой
+            x = rect.Width + 12;
+            y = (int)((rect.Height - rect.Y) * 0.92) + rect.Y;
+            VirtualMouse.SendMouseMovement(new Point(x, y));
+            VirtualMouse.SendMouseLeftClick(new Point(x, y));
+
+            Thread.Sleep(1000);
+
+            // Нажатие на оконку Настройки на рабочем столе
+            x = (int)((rect.Width - rect.X) * 0.896) + rect.X;
+            y = (int)((rect.Height - rect.Y) * 0.384) + rect.Y;
+            VirtualMouse.SendMouseMovement(new Point(x, y));
+            VirtualMouse.SendMouseLeftClick(new Point(x, y));
+
+            Thread.Sleep(2000);
+
+            // Нажатие на пункт Приложения в Настройках
+            x = (int)((rect.Width - rect.X) / 2) + rect.X;
+            y = (int)((rect.Height - rect.Y) * 0.759) + rect.Y;
+            VirtualMouse.SendMouseMovement(new Point(x, y));
+            VirtualMouse.SendMouseLeftClick(new Point(x, y));
+
+            Thread.Sleep(1000);
+
+            // Нажатие на пункт Приложения в Настройках
+            x = (int)((rect.Width - rect.X) / 2) + rect.X;
+            y = (int)((rect.Height - rect.Y) * 0.247) + rect.Y;
+            VirtualMouse.SendMouseMovement(new Point(x, y));
+            VirtualMouse.SendMouseLeftClick(new Point(x, y));
+
+            Thread.Sleep(1000);
+
+            // Нажатие на кнопку Стереть данные в настройках Bolt
+            x = (int)((rect.Width - rect.X) * 0.735) + rect.X;
+            y = (int)((rect.Height - rect.Y) * 0.434) + rect.Y;
+            VirtualMouse.SendMouseMovement(new Point(x, y));
+            VirtualMouse.SendMouseLeftClick(new Point(x, y));
+
+            Thread.Sleep(1000);
+
+            // Нажатие на кнопку ОK при подтверждении удаления данных
+            x = (int)((rect.Width - rect.X) * 0.801) + rect.X;
+            y = (int)((rect.Height - rect.Y) * 0.599) + rect.Y;
+            VirtualMouse.SendMouseMovement(new Point(x, y));
+            VirtualMouse.SendMouseLeftClick(new Point(x, y));
+
+            // Нажатие кнопки Домой
+            x = rect.Width + 12;
+            y = (int)((rect.Height - rect.Y) * 0.92) + rect.Y;
+            VirtualMouse.SendMouseMovement(new Point(x, y));
+            VirtualMouse.SendMouseLeftClick(new Point(x, y));
         }
 
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
