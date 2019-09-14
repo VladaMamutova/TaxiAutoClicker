@@ -37,6 +37,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -55,12 +56,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="BoltUser.cs" />
+    <Compile Include="BoltApplication\WindowManager.cs" />
+    <Compile Include="BoltApplication\User.cs" />
+    <Compile Include="WindowActions\Click.cs" />
+    <Compile Include="BoltApplication\ClickManager.cs" />
+    <Compile Include="WindowActions\EnterPresses.cs" />
+    <Compile Include="WindowActions\Input.cs" />
     <Compile Include="SMSActivateAPI\Profile.cs" />
     <Compile Include="SMSActivateAPI\Response.cs" />
-    <Compile Include="WinAPIHelper\VirtualKeyboard.cs" />
-    <Compile Include="WinAPIHelper\VirtualMouse.cs" />
-    <Compile Include="WinAPIHelper\WindowManager.cs" />
+    <Compile Include="WinAPI\VirtualKeyboard.cs" />
+    <Compile Include="WinAPI\VirtualMouse.cs" />
+    <Compile Include="WinAPI\WindowService.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

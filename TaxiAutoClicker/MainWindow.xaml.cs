@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows;
+using TaxiAutoClicker.BoltApplication;
 using TaxiAutoClicker.SMSActivateAPI;
-using TaxiAutoClicker.WinAPIHelper;
+using TaxiAutoClicker.WinAPI;
 using Point = System.Drawing.Point;
+using WindowService = TaxiAutoClicker.WinAPI.WindowService;
 
 namespace TaxiAutoClicker
 {
@@ -15,7 +18,7 @@ namespace TaxiAutoClicker
     public partial class MainWindow : Window
     {
         private Profile _smsactivateProfile;
-        private BoltUser _boltUser;
+        private User _boltUser;
         private List<Thread> orderingThreads;
 
         public MainWindow()
@@ -35,12 +38,12 @@ namespace TaxiAutoClicker
                 return;
             }
 
-            IntPtr[] windows = WindowManager
+            IntPtr[] windows = WindowService
                 .FindWindowsWithText("NoxPlayer").ToArray();
 
-            _boltUser = new BoltUser(APIKeyTextBox.Text, Mail.Text,
+            _boltUser = new User(APIKeyTextBox.Text, Mail.Text,
                 FirstName.Text, LastName.Text);
-            
+
             for (int i = 0; i < windows.Length; i++)
             {
                 IntPtr window = windows[i];
@@ -51,9 +54,9 @@ namespace TaxiAutoClicker
             }
         }
 
-        private void StartOrderingATaxi(IntPtr window, BoltUser user)
+        private void StartOrderingATaxi(IntPtr window, User user)
         {
-            WindowManager.GetWindowRect(window, out var rect);
+            WinAPI.WindowService.GetWindowRect(window, out var rect);
             int x = (rect.Width - rect.X) / 2 + rect.X;
             int y = (rect.Height - rect.Y) / 2 + rect.Y;
             VirtualMouse.SendMouseMovement(new Point(x, y));
@@ -123,7 +126,7 @@ namespace TaxiAutoClicker
             VirtualMouse.SendMouseLeftClick(new Point(x, y));
 
             Thread.Sleep(4500);
-
+            //int x, y;
             // Место нахождения кнопки "Выберите место назначания"
             x = (rect.Width - rect.X) / 2 + rect.X;
             y = (int)((rect.Height - rect.Y) * 0.918) + rect.Y;
@@ -221,7 +224,7 @@ namespace TaxiAutoClicker
             VirtualMouse.SendMouseMovement(new Point(x, y));
             VirtualMouse.SendMouseLeftClick(new Point(x, y));
 
-            Thread.Sleep(5000);
+            Thread.Sleep(3000);
 
             // Место нахождения кнопки подтверждения "Заказать Bolt"
             x = (rect.Width - rect.X) / 2 + rect.X;
@@ -263,6 +266,13 @@ namespace TaxiAutoClicker
 
             Thread.Sleep(1500);
 
+            IDataObject iData = Clipboard.GetDataObject();
+            if (iData != null && iData.GetDataPresent(DataFormats.Text))
+            {
+                string phoneNumber = (string)iData.GetData(DataFormats.Text);
+                File.AppendAllLines("Телефоны водителей.txt", new[] { phoneNumber });
+            }
+            
             // Нажатие кнопки Домой
             x = rect.Width + 12;
             y = (int)((rect.Height - rect.Y) * 0.92) + rect.Y;
@@ -338,7 +348,7 @@ namespace TaxiAutoClicker
 
             Thread.Sleep(1000);
 
-            // Нажатие на пункт Приложения в Настройках
+            // Нажатие на пункт Bolt в Приложениях
             x = (int)((rect.Width - rect.X) / 2) + rect.X;
             y = (int)((rect.Height - rect.Y) * 0.247) + rect.Y;
             VirtualMouse.SendMouseMovement(new Point(x, y));
