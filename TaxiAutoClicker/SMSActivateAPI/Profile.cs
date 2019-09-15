@@ -75,7 +75,7 @@ namespace TaxiAutoClicker.SMSActivateAPI
                 if (response.Code == Response.ResponseCodes.ACCESS_NUMBER)
                 {
                     ActivationId = response.Params[0];
-                    Number = response.Params[1];
+                    Number = response.Params[1].Substring(1); // Записываем номер без кода страны.
                 }
 
                 return response;

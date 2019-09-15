@@ -46,8 +46,23 @@ namespace TaxiAutoClicker
 
             for (int i = 0; i < windows.Length; i++)
             {
-                IntPtr window = windows[i];
-                Thread orderThread = new Thread(() => StartOrderingATaxi(window, _boltUser));
+                WindowManager windowManager =
+                    new WindowManager(windows[i], _boltUser);
+
+                Thread orderThread = new Thread(() =>
+                {
+                    try
+                    {
+                        windowManager.StartOrderingATaxi();
+                    }
+                    catch (Exception ex)
+                    {
+                        Dispatcher?.Invoke(() =>
+                        {
+                            MessageBox.Show(ex.Message);
+                        });
+                    }
+                });
                 orderThread.Start();
                 orderingThreads.Add(orderThread);
                 Thread.Sleep(200);
