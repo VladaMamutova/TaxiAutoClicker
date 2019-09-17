@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
@@ -56,17 +59,26 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ActionItem.cs" />
     <Compile Include="BoltApplication\WindowManager.cs" />
     <Compile Include="BoltApplication\User.cs" />
-    <Compile Include="WindowActions\Click.cs" />
+    <Compile Include="ClickManagerWindow.xaml.cs">
+      <DependentUpon>ClickManagerWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="InputActions\Click.cs" />
     <Compile Include="BoltApplication\ClickManager.cs" />
-    <Compile Include="WindowActions\EnterPresses.cs" />
-    <Compile Include="WindowActions\Input.cs" />
+    <Compile Include="InputActions\EnterPress.cs" />
+    <Compile Include="InputActions\KeyboardInput.cs" />
     <Compile Include="SMSActivateAPI\Profile.cs" />
     <Compile Include="SMSActivateAPI\Response.cs" />
     <Compile Include="WinAPI\VirtualKeyboard.cs" />
     <Compile Include="WinAPI\VirtualMouse.cs" />
     <Compile Include="WinAPI\WindowService.cs" />
+    <Compile Include="InputActions\Actions.cs" />
+    <Page Include="ClickManagerWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -98,6 +110,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

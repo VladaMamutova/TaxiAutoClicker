@@ -1,24 +1,31 @@
 ﻿using System;
-using System.Drawing;
-using System.Linq;
+using System.IO;
+using System.Text;
 using System.Threading;
+using System.Windows;
 using TaxiAutoClicker.SMSActivateAPI;
 using TaxiAutoClicker.WinAPI;
+using Point = System.Drawing.Point;
 
 namespace TaxiAutoClicker.BoltApplication
 {
     class WindowManager
     {
-        private ClickManager _clickManager;
-        private User _user;
-        private Profile _profile;
-        private Point _leftTop;
-        private int _width;
-        private int _height;
-        private const string clickFilePath = "Script files\\Clickes.txt";
+        private readonly ClickManager _clickManager;
+        private readonly User _user;
+        private readonly Profile _profile;
+        private readonly Point _leftTop;
+        private readonly int _width;
+        private readonly int _height;
 
         public IntPtr Handle { get; }
-        
+
+        public static string AddressesFilePath { get; } =
+            "Script files\\Addresses.txt";
+
+        public static string NumbersFilePath { get; } =
+            "Телефоны водителей.txt";
+
         public WindowManager(IntPtr handle, User user)
         {
             Handle = handle;
@@ -34,28 +41,36 @@ namespace TaxiAutoClicker.BoltApplication
         public void StartOrderingATaxi()
         {
             RegisterInBolt();
+            for (int i = 0; i < 8; i++)
+            {
+                OrderATaxi();
+                Thread.Sleep(2500);
+            }
+            ClearDataInBolt();
         }
 
 
         public void RegisterInBolt()
         {
-            int lastAction = _clickManager.RegistrationClicks.Keys.Max();
-            int x, y;
-            for (int i = 0; i <= lastAction; i++)
+            for (int i = 0; i < _clickManager.RegistrationActionsCount; i++)
             {
                 if (_clickManager.RegistrationClicks.ContainsKey(i))
                 {
-                    x = (int)(_width * _clickManager.RegistrationClicks[i].Position.X) + _leftTop.X;
-                    y = (int)(_height * _clickManager.RegistrationClicks[i].Position.Y) + _leftTop.Y;
+                    var x = (int) (_width *
+                                   _clickManager.RegistrationClicks[i].Position
+                                       .X) + _leftTop.X;
+                    var y = (int) (_height *
+                                   _clickManager.RegistrationClicks[i].Position
+                                       .Y) + _leftTop.Y;
                     VirtualMouse.SendMouseMovement(new Point(x, y));
                     VirtualMouse.SendMouseLeftClick(new Point(x, y));
                     Thread.Sleep(_clickManager.RegistrationClicks[i].Delay);
                 }
-                else if (_clickManager.Inputs.ContainsKey(i))
+                else if (_clickManager.KeyboardInputs.ContainsKey(i))
                 {
                     Response response;
                     string input = "";
-                    switch (_clickManager.Inputs[i].Description)
+                    switch (_clickManager.KeyboardInputs[i].Description)
                     {
                         case "Enter phone number":
                         {
@@ -70,7 +85,7 @@ namespace TaxiAutoClicker.BoltApplication
                             input = _profile.Number;
                             break;
                         }
-                        case "Enter the 1st digit of code":
+                        case "Enter code":
                         {
                             response = _profile.GetCode();
                             if (response.IsError)
@@ -80,23 +95,7 @@ namespace TaxiAutoClicker.BoltApplication
                                     response.Code);
                             }
 
-                            input = _profile.Code[0].ToString();
-                            break;
-
-                        }
-                        case "Enter the 2nd digit of code":
-                        {
-                            input = _profile.Code[1].ToString();
-                            break;
-                        }
-                        case "Enter the 3rd digit of code":
-                        {
-                            input = _profile.Code[2].ToString();
-                            break;
-                        }
-                        case "Enter the 4th digit of code":
-                        {
-                            input = _profile.Code[3].ToString();
+                            input = _profile.Code;
                             break;
                         }
                         case "Enter e-mail":
@@ -121,7 +120,7 @@ namespace TaxiAutoClicker.BoltApplication
                         VirtualKeyboard.PrintText(Handle, input);
                     }
 
-                    Thread.Sleep(_clickManager.Inputs[i].Delay);
+                    Thread.Sleep(_clickManager.KeyboardInputs[i].Delay);
                 }
                 else if (_clickManager.EnterPresses.ContainsKey(i))
                 {
@@ -132,10 +131,158 @@ namespace TaxiAutoClicker.BoltApplication
                 {
                     throw new Exception(
                         "Действие не было опознано. Файл кликов \"" +
-                        clickFilePath + "\" неполный.");
+                        _clickManager.ClicksFilePath + "\" неполный.");
                 }
             }
+
             _profile.CompleteWorkWithNumber();
+        }
+
+        public void OrderATaxi()
+        {
+            string[] addresses;
+            try
+            {
+                addresses =
+                    File.ReadAllLines(AddressesFilePath, Encoding.Default);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(
+                    "Невозможно прочесть адреса из файла \"" +
+                    AddressesFilePath + "\": " + ex.Message);
+            }
+
+            int addressFromIndex = -1;
+
+            int startIndex = _clickManager.RegistrationActionsCount;
+            for (int i = startIndex;
+                i < _clickManager.TaxiOrderingActionsCount + startIndex;
+                i++)
+            {
+                if (_clickManager.TaxiOrderingClicks.ContainsKey(i))
+                {
+                    int x = (int) (_width *
+                                   _clickManager.TaxiOrderingClicks[i].Position
+                                       .X) + _leftTop.X;
+                    int y;
+                    if (_clickManager.TaxiOrderingClicks[i].Description ==
+                        "Click reason for cancellation")
+                    {
+                        int reasonIndex = new Random().Next(0, 6);
+                        int caseAbsolutePosition =
+                            450 + 41 *
+                            reasonIndex; // (y=450 - первая причина на экране с h=768)
+                        double caseRelativePosition =
+                            caseAbsolutePosition / 768.0;
+                        y = (int) (_height *
+                                   _clickManager.TaxiOrderingClicks[i].Position
+                                       .Y * caseRelativePosition) + _leftTop.Y;
+                    }
+                    else
+                    {
+                        y = (int) (_height * _clickManager.TaxiOrderingClicks[i]
+                                       .Position.Y) + _leftTop.Y;
+                    }
+
+                    if (_clickManager.TaxiOrderingClicks[i].Description ==
+                        "DoubleClick to copy number")
+                    {
+                        VirtualMouse.SendMouseMovement(new Point(x, y));
+                        VirtualMouse.SendMouseDoubleClick(new Point(x, y));
+
+                        // Сохранение номера телефона водителя.
+                        IDataObject iData = Clipboard.GetDataObject();
+                        if (iData != null &&
+                            iData.GetDataPresent(DataFormats.Text))
+                        {
+                            string phoneNumber =
+                                (string) iData.GetData(DataFormats.Text);
+                            if (phoneNumber != null &&
+                                phoneNumber.StartsWith("+7"))
+                            {
+                                File.AppendAllLines(NumbersFilePath,
+                                    new[] {phoneNumber});
+                            }
+                        }
+                    }
+                    else
+                    {
+                        VirtualMouse.SendMouseMovement(new Point(x, y));
+                        VirtualMouse.SendMouseLeftClick(new Point(x, y));
+                    }
+
+                    Thread.Sleep(_clickManager.TaxiOrderingClicks[i].Delay);
+                }
+                else if (_clickManager.KeyboardInputs.ContainsKey(i))
+                {
+                    string input = "";
+                    switch (_clickManager.KeyboardInputs[i].Description)
+                    {
+                        case "Enter address from":
+                        {
+                            addressFromIndex =
+                                new Random().Next(0, addresses.Length);
+                            input = addresses[addressFromIndex];
+                            break;
+                        }
+                        case "Enter address to":
+                        {
+                            int addressToIndex;
+                            do
+                            {
+                                addressToIndex =
+                                    new Random().Next(0, addresses.Length);
+                            } while (addressToIndex == addressFromIndex);
+
+                            input = addresses[addressToIndex];
+                            break;
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(input))
+                    {
+                        VirtualKeyboard.PrintText(Handle, input);
+                    }
+
+                    Thread.Sleep(_clickManager.KeyboardInputs[i].Delay);
+                }
+                else
+                {
+                    throw new Exception(
+                        "Действие не было опознано. Файл кликов \"" +
+                        _clickManager.ClicksFilePath + "\" неполный.");
+                }
+            }
+        }
+
+        public void ClearDataInBolt()
+        {
+
+            int startIndex = _clickManager.RegistrationActionsCount + _clickManager.TaxiOrderingActionsCount;
+            for (int i = startIndex;
+                i < _clickManager.DataCleaningActionsCount + startIndex;
+                i++)
+            {
+                if (_clickManager.DataCleaningClicks.ContainsKey(i))
+                {
+                    var x = (int) (_width *
+                                   _clickManager.DataCleaningClicks[i].Position
+                                       .X) + _leftTop.X;
+                    var y = (int) (_height *
+                                   _clickManager.DataCleaningClicks[i].Position
+                                       .Y) + _leftTop.Y;
+                    VirtualMouse.SendMouseMovement(new Point(x, y));
+                    VirtualMouse.SendMouseLeftClick(new Point(x, y));
+                    Thread.Sleep(_clickManager.DataCleaningClicks[i].Delay);
+                }
+                else
+                {
+                    throw new Exception(
+                        "Действие не было опознано. Файл кликов \"" +
+                        _clickManager.ClicksFilePath + "\" неполный.");
+                }
+            }
         }
     }
 }

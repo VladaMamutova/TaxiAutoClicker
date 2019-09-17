@@ -4,89 +4,42 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="TaxiAutoClicker" FontSize="14" SizeToContent="Height" Width="310" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Loaded="MainWindow_OnLoaded" Closed="MainWindow_OnClosed">
-    <Window.Resources>
-        <SolidColorBrush Color="#FF1E78FF" x:Key="HoverColor" />
-        <Style x:Key="APIKeyPasteButton" TargetType="{x:Type Button}">
-            <Setter Property="Width" Value="20"></Setter>
-            <Setter Property="Height" Value="20"></Setter>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
-                        <Border x:Name="border" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center" BorderThickness="0">
-                            <Viewbox Width="18" Height="18">
-                                <Canvas Width="20" Height="20">
-                                    <Path Name="IconPath"  Data="M6.5,3C8.46,3 10.13,4.25 10.74,6H22V9H18V12H15V9H10.74C10.13,
-                                          10.75 8.46,12 6.5,12C4,12 2,10 2,7.5C2,5 4,3 6.5,3M6.5,6A1.5,
-                                          1.5 0 0,0 5,7.5A1.5,1.5 0 0,0 6.5,9A1.5,1.5 0 0,0 8,7.5A1.5,
-                                          1.5 0 0,0 6.5,6M8,17H11V14H13V17H16V19H13V22H11V19H8V17Z" Fill="LightSkyBlue" />
-                                </Canvas>
-                            </Viewbox>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Cursor" Value="Hand"/>
-                                <Setter Property="Fill" TargetName="IconPath" Value="DodgerBlue"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style TargetType="{x:Type Button}">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
-                        <Border x:Name="ButtonBorder" Height="35" Background="DodgerBlue" BorderThickness="0">
-                            <TextBlock Text="{TemplateBinding Property=ContentStringFormat}"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center"
-                                       Foreground="White"></TextBlock>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Cursor" Value="Hand"/>
-                                <Setter Property="Background" TargetName="ButtonBorder" Value="{StaticResource HoverColor}"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </Window.Resources>
+        Title="TaxiAutoClicker" FontSize="14" SizeToContent="Height" Width="310" 
+        ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Closed="MainWindow_OnClosed">
     <Grid>
-        <StackPanel Margin="15 15 15 35">
-            <Grid Margin="0 0 5 0">
-                <TextBlock Text="API-ключ для sms-activate.ru:" Margin="0 2 0 0"/>
-                <Button Style="{StaticResource APIKeyPasteButton}" ToolTip="Вставить Api-ключ" HorizontalAlignment="Right" Click="PasteApi_OnClick"></Button>
-            </Grid>
-            <TextBox Name="APIKeyTextBox" Padding="5" Margin="0 5 0 7"/>
-            <TextBlock Text="Почтовый адрес:"/>
-            <TextBox Name="Mail" Padding="5" Margin="0 5 0 7"/>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0.7*"></ColumnDefinition>
-                    <ColumnDefinition Width="5"></ColumnDefinition>
-                    <ColumnDefinition></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                <StackPanel>
-                    <TextBlock Text="Имя:"/>
-                    <TextBox Name="FirstName" Padding="5" Margin="0 5 0 7"/>
-                </StackPanel>
-                <StackPanel Grid.Column="2">
-                    <TextBlock Text="Фамилия:"/>
-                    <TextBox Name="LastName" Padding="5" Margin="0 5 0 7"/>
-                </StackPanel>
-            </Grid>
-            <Button Name="LaunchButton" ContentStringFormat="Запустить заказ такси" Margin="0 5 0 0"
+        <StackPanel>
+            <Menu Height="25">
+                <MenuItem Header="Настройки" Padding="15 3 15 3">
+                    <MenuItem Header="Управление кликами..." Click="ManageClicksWindow_Click"></MenuItem>
+                </MenuItem>
+            </Menu>
+            <StackPanel Margin="15 15 15 15">
+                <Grid Margin="0 0 5 0">
+                    <TextBlock Text="API-ключ для sms-activate.ru:" Margin="0 2 0 0"/>
+                    <Button Style="{StaticResource APIPasteButton}" ToolTip="Вставить Api-ключ" HorizontalAlignment="Right" Click="PasteApi_OnClick"></Button>
+                </Grid>
+                <TextBox Name="APIKeyTextBox" Padding="5" Margin="0 5 0 7"/>
+                <TextBlock Text="Почтовый адрес:"/>
+                <TextBox Name="Mail" Padding="5" Margin="0 5 0 7"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.7*"></ColumnDefinition>
+                        <ColumnDefinition Width="5"></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="Имя:"/>
+                        <TextBox Name="FirstName" Padding="5" Margin="0 5 0 7"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Фамилия:"/>
+                        <TextBox Name="LastName" Padding="5" Margin="0 5 0 7"/>
+                    </StackPanel>
+                </Grid>
+                <Button Name="LaunchButton" Style="{StaticResource PrimaryButton}" ContentStringFormat="Запустить заказ такси" Margin="0 5 0 0"
                     ToolTip="Автокликер будет запущен в каждом открытом окне NoxPlayer" Click="LaunchAutoClicker_Click">
-            </Button>
-        </StackPanel>
-        <StackPanel Margin="15 5" VerticalAlignment="Bottom" HorizontalAlignment="Right" Orientation="Horizontal">
-            <TextBlock Text="X: "/>
-            <TextBlock Name="XTextBlock" Width="30"/>
-            <TextBlock Width="5"/>
-            <TextBlock Text="Y: "/>
-            <TextBlock Name="YTextBlock" Width="30"/>
+                </Button>
+            </StackPanel>
         </StackPanel>
     </Grid>
 </Window>

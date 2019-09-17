@@ -14,3 +14,9 @@ D:\MyApplications\TaxiAutoClicker\TaxiAutoClicker\obj\Debug\TaxiAutoClicker.cspr
 D:\MyApplications\TaxiAutoClicker\TaxiAutoClicker\obj\Debug\TaxiAutoClicker.exe
 D:\MyApplications\TaxiAutoClicker\TaxiAutoClicker\obj\Debug\TaxiAutoClicker.pdb
 D:\MyApplications\TaxiAutoClicker\TaxiAutoClicker\obj\Debug\TaxiAutoClicker.csprojAssemblyReference.cache
+D:\MyApplications\TaxiAutoClicker\TaxiAutoClicker\bin\Debug\Newtonsoft.Json.dll
+D:\MyApplications\TaxiAutoClicker\TaxiAutoClicker\bin\Debug\Newtonsoft.Json.xml
+D:\MyApplications\TaxiAutoClicker\TaxiAutoClicker\obj\Debug\ClickManagerWindow.g.cs
+D:\MyApplications\TaxiAutoClicker\TaxiAutoClicker\obj\Debug\TaxiAutoClicker_MarkupCompile.lref
+D:\MyApplications\TaxiAutoClicker\TaxiAutoClicker\obj\Debug\ClickManagerWindow.baml
+D:\MyApplications\TaxiAutoClicker\TaxiAutoClicker\obj\Debug\App.baml

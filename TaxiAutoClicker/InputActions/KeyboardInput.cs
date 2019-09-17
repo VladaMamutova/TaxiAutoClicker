@@ -1,16 +1,16 @@
 ﻿using System.Runtime.Serialization;
 
-namespace TaxiAutoClicker.WindowActions
+namespace TaxiAutoClicker.InputActions
 {
     [DataContract]
-    public struct EnterPresses
+    public class KeyboardInput
     {
         [DataMember]
         public string Description;
         [DataMember]
         public int Delay;
 
-        public EnterPresses(string description, int delay)
+        public KeyboardInput(string description, int delay)
         {
             Description = description;
             Delay = delay;

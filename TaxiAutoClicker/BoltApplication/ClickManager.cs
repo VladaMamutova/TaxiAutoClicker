@@ -1,29 +1,47 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Runtime.Serialization.Json;
-using TaxiAutoClicker.WindowActions;
+using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using TaxiAutoClicker.InputActions;
 
 namespace TaxiAutoClicker.BoltApplication
 {
-    class ClickManager
+    public class ClickManager
     {
         private static ClickManager _clickManager;
+        private static ClickManager _clickManagerCopy;
         private static readonly object SyncRoot = new object();
 
         public Dictionary<int, Click> RegistrationClicks { get; }
         public Dictionary<int, Click> TaxiOrderingClicks { get; }
-        public Dictionary<int, Click> DeregistrationClicks { get; }
-        public Dictionary<int, Input> Inputs { get; }
-        public Dictionary<int, EnterPresses> EnterPresses { get; }
+        public Dictionary<int, Click> DataCleaningClicks { get; }
+        public Dictionary<int, KeyboardInput> KeyboardInputs { get; }
+        public Dictionary<int, EnterPress> EnterPresses { get; }
+
+        public int RegistrationActionsCount { get; } = 11;
+        public int TaxiOrderingActionsCount { get; } = 21;
+        public int DataCleaningActionsCount { get; } = 7;
+
+        public int BoltIconKey { get; } = 28;
+        public int SettingsIconKey { get; } = 33;
+
+        public int ActionsCount => RegistrationActionsCount +
+                                   TaxiOrderingActionsCount +
+                                   DataCleaningActionsCount;
+
+        public string ClicksFilePath { get; } =
+            "Script files\\Clickes.json";
 
         private ClickManager()
         {
             RegistrationClicks = new Dictionary<int, Click>();
             TaxiOrderingClicks = new Dictionary<int, Click>();
-            DeregistrationClicks = new Dictionary<int, Click>();
-            Inputs = new Dictionary<int, Input>();
-            EnterPresses = new Dictionary<int, EnterPresses>();
+            DataCleaningClicks = new Dictionary<int, Click>();
+            KeyboardInputs = new Dictionary<int, KeyboardInput>();
+            EnterPresses = new Dictionary<int, EnterPress>();
         }
 
         public static ClickManager GetClickManager()
@@ -33,96 +51,296 @@ namespace TaxiAutoClicker.BoltApplication
                 lock (SyncRoot)
                 {
                     _clickManager = new ClickManager();
-                    _clickManager.InitializeDefaultClicks();
+                    _clickManager.LoadClicksFromFile();
                 }
             }
 
             return _clickManager;
         }
 
+        public static ClickManager GetCopyClickManager()
+        {
+            lock (SyncRoot)
+            {
+                _clickManagerCopy = new ClickManager();
+
+                if (_clickManager != null)
+                {
+                    foreach (var click in _clickManager.RegistrationClicks)
+                    {
+                        _clickManagerCopy.RegistrationClicks.Add(click.Key,
+                            click.Value);
+                    }
+
+                    foreach (var click in _clickManager.TaxiOrderingClicks)
+                    {
+                        _clickManagerCopy.TaxiOrderingClicks.Add(click.Key,
+                            click.Value);
+                    }
+
+                    foreach (var click in _clickManager.DataCleaningClicks)
+                    {
+                        _clickManagerCopy.DataCleaningClicks.Add(click.Key,
+                            click.Value);
+                    }
+
+                    foreach (var keyboardInput in _clickManager.KeyboardInputs)
+                    {
+                        _clickManagerCopy.KeyboardInputs.Add(keyboardInput.Key,
+                            keyboardInput.Value);
+                    }
+
+                    foreach (var enterPress in _clickManager.EnterPresses)
+                    {
+                        _clickManagerCopy.EnterPresses.Add(enterPress.Key,
+                            enterPress.Value);
+                    }
+                }
+                else
+                {
+                    _clickManager = new ClickManager();
+                    _clickManager.InitializeDefaultClicks();
+                    _clickManagerCopy.InitializeDefaultClicks();
+                }
+            }
+
+            return _clickManagerCopy;
+        }
+
+        public void SynchronizeOrigin()
+        {
+            lock (SyncRoot)
+            {
+                _clickManager = new ClickManager();
+
+                if (_clickManagerCopy != null)
+                {
+                    foreach (var click in _clickManagerCopy.RegistrationClicks)
+                    {
+                        _clickManager.RegistrationClicks.Add(click.Key,
+                            click.Value);
+                    }
+
+                    foreach (var click in _clickManagerCopy.TaxiOrderingClicks)
+                    {
+                        _clickManager.TaxiOrderingClicks.Add(click.Key,
+                            click.Value);
+                    }
+
+                    foreach (var click in _clickManagerCopy.DataCleaningClicks)
+                    {
+                        _clickManager.DataCleaningClicks.Add(click.Key,
+                            click.Value);
+                    }
+
+                    foreach (var keyboardInput in _clickManagerCopy.KeyboardInputs)
+                    {
+                        _clickManager.KeyboardInputs.Add(keyboardInput.Key,
+                            keyboardInput.Value);
+                    }
+
+                    foreach (var enterPress in _clickManagerCopy.EnterPresses)
+                    {
+                        _clickManager.EnterPresses.Add(enterPress.Key,
+                            enterPress.Value);
+                    }
+                }
+                else
+                {
+                    _clickManagerCopy = new ClickManager();
+                    _clickManager.InitializeDefaultClicks();
+                    _clickManagerCopy.InitializeDefaultClicks();
+                }
+            }
+        }
+
+        public void DisposeCopy()
+        {
+            _clickManagerCopy = null;
+        }
+
         public void SaveClicksToFile()
         {
-            DataContractJsonSerializer clickJsonFormatter = new DataContractJsonSerializer(typeof(Click));
-
-            using (FileStream fs = new FileStream("Clicks.json", FileMode.OpenOrCreate))
+            using (FileStream fs = new FileStream(ClicksFilePath, FileMode.OpenOrCreate))
             {
-                //clickJsonFormatter.WriteObject(fs, _clicks);
-            }
-            //using (FileStream filetream = new FileStream("Clicks", FileMode.OpenOrCreate))
-            //{
-            //    foreach (var click in _clicks)
-            //    {
-            //        byte[] array = System.Text.Encoding.UTF8.GetBytes(click.Value.ToString() + Environment.NewLine);
-            //        filetream.Write(array, 0, array.Length);
-            //    }
+                using (StreamWriter sw = new StreamWriter(fs, Encoding.Default))
+                {
+                    for (int i = 0; i < _clickManager.ActionsCount; i++)
+                    {
+                        JObject jobject;
+                        if (_clickManager.RegistrationClicks.ContainsKey(i))
+                        {
+                            jobject =
+                                JObject.FromObject(_clickManager.RegistrationClicks[i]);
+                            sw.WriteLine(Actions.Click + Environment.NewLine + jobject);
+                        }
+                        else if (_clickManager.TaxiOrderingClicks
+                            .ContainsKey(i))
+                        {
+                            jobject =
+                                JObject.FromObject(_clickManager.TaxiOrderingClicks[i]);
+                            sw.WriteLine(Actions.Click + Environment.NewLine + jobject);
+                        }
+                        else if (_clickManager.DataCleaningClicks
+                            .ContainsKey(i))
+                        {
 
-            //}
+                            jobject =
+                                JObject.FromObject(_clickManager.DataCleaningClicks[i]);
+                            sw.WriteLine(Actions.Click + Environment.NewLine + jobject);
+                        }
+                        else if (_clickManager.KeyboardInputs.ContainsKey(i))
+                        {
+                            jobject =
+                                JObject.FromObject(_clickManager.KeyboardInputs[i]);
+                            sw.WriteLine(Actions.KeyboardInput + Environment.NewLine + jobject);
+                        }
+                        else if (_clickManager.EnterPresses.ContainsKey(i))
+                        {
+                            jobject =
+                                JObject.FromObject(_clickManager.EnterPresses[i]);
+                            sw.WriteLine(Actions.EnterPress + Environment.NewLine + jobject);
+                        }
+                    }
+                }
+            }
         }
 
         public void LoadClicksFromFile()
         {
-            DataContractJsonSerializer jsonFormatter = new DataContractJsonSerializer(typeof(Click[]));
+            RegistrationClicks.Clear();
+            TaxiOrderingClicks.Clear();
+            DataCleaningClicks.Clear();
+            KeyboardInputs.Clear();
+            EnterPresses.Clear();
 
-            using (FileStream fs = new FileStream("Clicks.json", FileMode.OpenOrCreate))
+            using (FileStream fs = new FileStream(ClicksFilePath, FileMode.OpenOrCreate))
             {
-                Click[] clicks = (Click[])jsonFormatter.ReadObject(fs);
-
-                foreach (Click click in clicks)
+                using (StreamReader sr = new StreamReader(fs, Encoding.Default))
                 {
-                    //AddClick(click);
+                    int actionsCount = 0;
+                    while (!sr.EndOfStream)
+                    {
+                        if (Enum.TryParse(sr.ReadLine(), out Actions action))
+                        {
+                            string line;
+                            string jobjectString = "";
+                            do
+                            {
+                                line = sr.ReadLine();
+                                jobjectString += line;
+                            } while (line != "}");
+
+                            switch (action)
+                            {
+                                case Actions.Click:
+                                {
+                                    if (actionsCount < RegistrationActionsCount)
+                                    {
+                                        RegistrationClicks.Add(actionsCount,
+                                            JsonConvert
+                                                .DeserializeObject<Click>(
+                                                    jobjectString));
+                                    }
+                                    else if (actionsCount <
+                                             TaxiOrderingActionsCount + RegistrationActionsCount)
+                                    {
+                                        TaxiOrderingClicks.Add(actionsCount,
+                                            JsonConvert
+                                                .DeserializeObject<Click>(
+                                                    jobjectString));
+                                    }
+                                    else
+                                    {
+                                        DataCleaningClicks.Add(actionsCount,
+                                            JsonConvert
+                                                .DeserializeObject<Click>(
+                                                    jobjectString));
+                                    }
+
+                                    break;
+                                }
+                                case Actions.KeyboardInput:
+                                {
+                                    KeyboardInputs.Add(actionsCount,
+                                        JsonConvert
+                                            .DeserializeObject<KeyboardInput>(
+                                                jobjectString));
+                                        break;
+                                }
+                                case Actions.EnterPress:
+                                {
+                                    EnterPresses.Add(actionsCount,
+                                        JsonConvert
+                                            .DeserializeObject<EnterPress>(
+                                                jobjectString));
+                                    break;
+                                    }
+                            }
+                        }
+                        else
+                        {
+                            throw new Exception(
+                                "Действие не было опознано. Файл кликов \"" +
+                                ClicksFilePath + "\" был повреждён.");
+                        }
+
+                        actionsCount++;
+                    }
                 }
             }
         }
         
         public void InitializeDefaultClicks()
         {
+            RegistrationClicks.Clear();
+            TaxiOrderingClicks.Clear();
+            DataCleaningClicks.Clear();
+            KeyboardInputs.Clear();
+            EnterPresses.Clear();
+
             int number = 0;
             RegistrationClicks.Add(number++, new Click(new PointF(0.5f, 0.5f), "Click phone number field", 0));
-            Inputs.Add(number++, new Input("Enter phone number", 1000));
-            RegistrationClicks.Add(number++, new Click(new PointF(0.5f, 0.941f), "Click Next", 0));
-            Inputs.Add(number++, new Input("Enter the 1st digit of code", 300));
-            Inputs.Add(number++, new Input("Enter the 2nd digit of code", 300));
-            Inputs.Add(number++, new Input("Enter the 3rd digit of code", 300));
-            Inputs.Add(number++, new Input("Enter the 4th digit of code", 3000));
-            RegistrationClicks.Add(number++, new Click(new PointF(0.5f, 0.275f), "Click e-mail field", 1000));
-            Inputs.Add(number++, new Input("Enter e-mail", 1500));
-            EnterPresses.Add(number++, new EnterPresses("Press Enter", 700));
-            Inputs.Add(number++, new Input("Enter first name", 1500));
-            EnterPresses.Add(number++, new EnterPresses("Press Enter", 700));
-            Inputs.Add(number++, new Input("Enter last name", 1500));
-            RegistrationClicks.Add(number++, new Click(new PointF(0.5f, 0.945f), "Click Next", 4500));
+            KeyboardInputs.Add(number++, new KeyboardInput("Enter phone number", 1000));
+            RegistrationClicks.Add(number++, new Click(new PointF(0.5f, 0.940269768f), "Click Next", 0));
+            KeyboardInputs.Add(number++, new KeyboardInput("Enter code", 3000));
+            RegistrationClicks.Add(number++, new Click(new PointF(0.5f, 0.274566472f), "Click e-mail field", 1000));
+            KeyboardInputs.Add(number++, new KeyboardInput("Enter e-mail", 1500));
+            EnterPresses.Add(number++, new EnterPress("Press Enter", 700));
+            KeyboardInputs.Add(number++, new KeyboardInput("Enter first name", 1500));
+            EnterPresses.Add(number++, new EnterPress("Press Enter", 700));
+            KeyboardInputs.Add(number++, new KeyboardInput("Enter last name", 1500));
+            RegistrationClicks.Add(number++, new Click(new PointF(0.5f, 0.9441233f), "Click Next", 4500));
 
-            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.918f), "Click Search destination", 1000));
-            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.15f), "Click Pickup location", 1000));
-            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.915f, 0.15f), "Click x in Pickup location Field", 500));
-            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.2f), "Click Where to?", 1000));
-            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.915f, 0.2f), "Click x in Where to? Field", 500));
-            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.15f), "Click Pickup location", 500));
-            Inputs.Add(number++, new Input("Enter address trom", 1500));
-            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.367f), "Click address from", 500));
-            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.2f), "Click Where to?", 500));
-            Inputs.Add(number++, new Input("Enter address to", 1500));
-            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.255f), "Click address to", 7000));
-            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.944f), "Click Select Bolt", 3000));
-            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.944f), "Click Request Bolt", 15000));
-            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.903f, 0.893f), "Click driver photo", 1500));
-            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.194f, 0.932f), "Click Contact", 500));
-            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.842f), "Click Call", 3000));
-            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.654f), "DoubleClick to copy number", 1500));
-            TaxiOrderingClicks.Add(number++, new Click(new PointF(1.029f, 0.92f), "Click Home", 1000));
-            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.374f, 0.384f), "Click Bolt icon", 3000));
-            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.903f, 0.893f), "Click driver photo", 1500));
-            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.803f, 0.933f), "Click Cancel", 1000));
-            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.745f, 0.944f), "Click Cancel Ride", 1000));
+            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.917148352f), "Click Search destination", 1000));
+            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.153214768f), "Click Pickup location", 1000));
+            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.9137324f, 0.153214768f), "Click x in Pickup location Field", 500));
+            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.201094389f), "Click Where to?", 1000));
+            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.9137324f, 0.201094389f), "Click x in Where to? Field", 500));
+            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.153214768f), "Click Pickup location", 500));
+            KeyboardInputs.Add(number++, new KeyboardInput("Enter address from", 1500));
+            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.366088629f), "Click address from", 500));
+            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.201094389f), "Click Where to?", 500));
+            KeyboardInputs.Add(number++, new KeyboardInput("Enter address to", 1500));
+            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.254335254f), "Click address to", 7000));
+            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.943159938f), "Click Select Bolt", 2000));
+            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.943159938f), "Click Request Bolt", 15000));
+            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.92957747f, 0.8795761f), "Click chevron-up button", 1500));
+            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.125f, 0.8265896f), "Click Call", 3000));
+            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.653179169f), "DoubleClick to copy number", 1500));
+            TaxiOrderingClicks.Add(number++, new Click(new PointF(1.04797983f, 0.896081746f), "Click Home", 1500));
+            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.6919014f, 0.383429676f), "Click Bolt icon", 3000));
+            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.8556338f, 0.8265896f), "Click Cancel", 1500));
+            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.9633911f), "Click Cancel ride", 1000));
             TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 1.0f), "Click reason for cancellation", 1000));
-
-            DeregistrationClicks.Add(number++, new Click(new PointF(1.029f, 0.92f), "Click Home", 1000));
-            DeregistrationClicks.Add(number++, new Click(new PointF(0.896f, 0.384f), "Click settings icon", 2000));
-            DeregistrationClicks.Add(number++, new Click(new PointF(0.5f, 0.759f), "Click applications in settings", 1000));
-            DeregistrationClicks.Add(number++, new Click(new PointF(0.5f, 0.247f), "Click Bolt in applications", 1000));
-            DeregistrationClicks.Add(number++, new Click(new PointF(0.735f, 0.434f), "Click Clear Data", 1000));
-            DeregistrationClicks.Add(number++, new Click(new PointF(0.801f, 0.599f), "Click OK", 1000));
-            DeregistrationClicks.Add(number, new Click(new PointF(1.029f, 0.92f), "Click Home", 1000));
+            
+            DataCleaningClicks.Add(number++, new Click(new PointF(1.04797983f, 0.896081746f), "Click Home", 1000));
+            DataCleaningClicks.Add(number++, new Click(new PointF(0.8863636f, 0.3857729f), "Click Settings icon", 3000));
+            DataCleaningClicks.Add(number++, new Click(new PointF(0.5f, 0.760601938f), "Click applications in settings", 1500));
+            DataCleaningClicks.Add(number++, new Click(new PointF(0.5f, 0.24897401f), "Click Bolt in applications", 3000));
+            DataCleaningClicks.Add(number++, new Click(new PointF(0.7323232f, 0.432284534f), "Click Clear Data", 1000));
+            DataCleaningClicks.Add(number++, new Click(new PointF(0.7929293f, 0.6019152f), "Click OK", 1500));
+            DataCleaningClicks.Add(number, new Click(new PointF(1.04797983f, 0.896081746f), "Click Home", 1000));
         }
     }
 }

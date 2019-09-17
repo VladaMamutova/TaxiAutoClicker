@@ -20,6 +20,9 @@ namespace TaxiAutoClicker.WinAPI
         [DllImport("user32.dll", SetLastError = true)]
         internal static extern bool GetWindowRect(IntPtr hWnd, out Rectangle lpRect);
 
+        [DllImport("user32.dll")]
+        internal static extern IntPtr GetForegroundWindow();
+
         // Delegate to filter which windows to include 
         public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
 

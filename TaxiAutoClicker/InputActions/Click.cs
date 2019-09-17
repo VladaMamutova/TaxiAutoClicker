@@ -1,10 +1,10 @@
 ﻿using System.Drawing;
 using System.Runtime.Serialization;
 
-namespace TaxiAutoClicker.WindowActions
+namespace TaxiAutoClicker.InputActions
 {
     [DataContract]
-    public struct Click
+    public class Click
     {
         [DataMember]
         public PointF Position;
