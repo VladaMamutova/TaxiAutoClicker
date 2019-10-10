@@ -26,6 +26,18 @@ namespace TaxiAutoClicker.BoltApplication
         public static string NumbersFilePath { get; } =
             "Телефоны водителей.txt";
 
+        // default is false, set 1 for true.
+        private int _threadSafeBoolBackValue;
+
+        public bool ThreadSafeBool
+        {
+            get => Interlocked.CompareExchange(ref _threadSafeBoolBackValue, 1, 1) == 1;
+            set
+            {
+                if (value) Interlocked.CompareExchange(ref _threadSafeBoolBackValue, 1, 0);
+                else Interlocked.CompareExchange(ref _threadSafeBoolBackValue, 0, 1);
+            }
+        }
         public WindowManager(IntPtr handle, User user)
         {
             Handle = handle;
@@ -38,33 +50,30 @@ namespace TaxiAutoClicker.BoltApplication
             _clickManager = ClickManager.GetClickManager();
         }
 
-        public void StartOrderingATaxi()
-        {
-            RegisterInBolt();
-            for (int i = 0; i < 8; i++)
-            {
-                OrderATaxi();
-                Thread.Sleep(2500);
-            }
-            ClearDataInBolt();
-        }
-
-
         public void RegisterInBolt()
         {
             for (int i = 0; i < _clickManager.RegistrationActionsCount; i++)
             {
                 if (_clickManager.RegistrationClicks.ContainsKey(i))
                 {
-                    var x = (int) (_width *
-                                   _clickManager.RegistrationClicks[i].Position
-                                       .X) + _leftTop.X;
-                    var y = (int) (_height *
-                                   _clickManager.RegistrationClicks[i].Position
-                                       .Y) + _leftTop.Y;
-                    VirtualMouse.SendMouseMovement(new Point(x, y));
-                    VirtualMouse.SendMouseLeftClick(new Point(x, y));
-                    Thread.Sleep(_clickManager.RegistrationClicks[i].Delay);
+                    if (_clickManager.RegistrationClicks[i].Description !=
+                        "Click 1st field of code")
+                    {
+                        var x = (int) (_width *
+                                       _clickManager.RegistrationClicks[i]
+                                           .Position
+                                           .X) + _leftTop.X;
+                        var y = (int) (_height *
+                                       _clickManager.RegistrationClicks[i]
+                                           .Position
+                                           .Y) + _leftTop.Y;
+                        while (ThreadSafeBool)
+                        {
+                            Thread.Sleep(100);
+                        }
+                        VirtualMouse.SendLeftClick(new Point(x, y));
+                        Thread.Sleep(_clickManager.RegistrationClicks[i].Delay);
+                    }
                 }
                 else if (_clickManager.KeyboardInputs.ContainsKey(i))
                 {
@@ -78,7 +87,7 @@ namespace TaxiAutoClicker.BoltApplication
                             if (response.IsError)
                             {
                                 throw new Exception(
-                                    "Не удалось получить виртуальный номер:" +
+                                    "Не удалось получить виртуальный номер: " +
                                     response.Code);
                             }
 
@@ -91,15 +100,53 @@ namespace TaxiAutoClicker.BoltApplication
                             if (response.IsError)
                             {
                                 throw new Exception(
-                                    "Не удалось получить код на виртуальный номер:" +
+                                    "Не удалось получить код на виртуальный номер: " +
                                     response.Code);
                             }
 
-                            input = _profile.Code;
+                            Thread.Sleep(300);
+
+                            // Непосредственно перед вводом данным кликаем по полю,
+                            // в случае если оно стало неактивным вследствие
+                            // действий пользователя или работы нескольких потоков
+                            // с несколькими окнами.
+
+                            var x = (int) (_width * _clickManager.RegistrationClicks[i - 1]
+                                               .Position.X) + _leftTop.X;
+                            var y = (int) (_height * _clickManager.RegistrationClicks[i - 1]
+                                               .Position.Y) + _leftTop.Y;
+                            VirtualMouse.SendLeftClick(new Point(x, y));
+
+                            VirtualKeyboard.PrintNumber(Handle, _profile.Code,
+                                500);
+
+                            input = "";
+
                             break;
                         }
                         case "Enter e-mail":
                         {
+                            // Блокируем остальные потоки на время ввода всех
+                            // регистрационных данных.
+                            while (ThreadSafeBool)
+                            {
+                                Thread.Sleep(100);
+                            }
+
+                            ThreadSafeBool = true;
+
+                            // Непосредственно перед вводом данным кликаем по полю,
+                            // в случае если оно стало неактивным вследствие
+                            // действий пользователя или работы нескольких потоков
+                            // с несколькими окнами.
+                            var x = (int) (_width * _clickManager
+                                               .RegistrationClicks[i - 1]
+                                               .Position.X) + _leftTop.X;
+                            var y = (int) (_height * _clickManager
+                                               .RegistrationClicks[i - 1]
+                                               .Position.Y) + _leftTop.Y;
+                            VirtualMouse.SendLeftClick(new Point(x, y));
+
                             input = _user.Mail;
                             break;
                         }
@@ -120,12 +167,21 @@ namespace TaxiAutoClicker.BoltApplication
                         VirtualKeyboard.PrintText(Handle, input);
                     }
 
+                    // При последнем вводе данных снимаем блокировку потоков.
+                    if (_clickManager.KeyboardInputs[i].Description ==
+                        "Enter last name")
+                    {
+                        ThreadSafeBool = false;
+                    }
+
                     Thread.Sleep(_clickManager.KeyboardInputs[i].Delay);
-                }
-                else if (_clickManager.EnterPresses.ContainsKey(i))
-                {
-                    VirtualKeyboard.PressEnter();
-                    Thread.Sleep(_clickManager.EnterPresses[i].Delay);
+
+                    if (_clickManager.EnterPresses.ContainsKey(i+1))
+                    {
+                        i++;
+                        VirtualKeyboard.PressEnter();
+                        Thread.Sleep(_clickManager.EnterPresses[i].Delay);
+                    }
                 }
                 else
                 {
@@ -188,8 +244,9 @@ namespace TaxiAutoClicker.BoltApplication
                     if (_clickManager.TaxiOrderingClicks[i].Description ==
                         "DoubleClick to copy number")
                     {
-                        VirtualMouse.SendMouseMovement(new Point(x, y));
-                        VirtualMouse.SendMouseDoubleClick(new Point(x, y));
+                        VirtualMouse.SendLeftClick(new Point(x, y));
+
+                        Thread.Sleep(500);
 
                         // Сохранение номера телефона водителя.
                         IDataObject iData = Clipboard.GetDataObject();
@@ -208,8 +265,7 @@ namespace TaxiAutoClicker.BoltApplication
                     }
                     else
                     {
-                        VirtualMouse.SendMouseMovement(new Point(x, y));
-                        VirtualMouse.SendMouseLeftClick(new Point(x, y));
+                        VirtualMouse.SendLeftClick(new Point(x, y));
                     }
 
                     Thread.Sleep(_clickManager.TaxiOrderingClicks[i].Delay);
@@ -272,8 +328,7 @@ namespace TaxiAutoClicker.BoltApplication
                     var y = (int) (_height *
                                    _clickManager.DataCleaningClicks[i].Position
                                        .Y) + _leftTop.Y;
-                    VirtualMouse.SendMouseMovement(new Point(x, y));
-                    VirtualMouse.SendMouseLeftClick(new Point(x, y));
+                    VirtualMouse.SendLeftClick(new Point(x, y));
                     Thread.Sleep(_clickManager.DataCleaningClicks[i].Delay);
                 }
                 else

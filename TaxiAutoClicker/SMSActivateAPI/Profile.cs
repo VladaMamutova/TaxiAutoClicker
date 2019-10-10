@@ -62,7 +62,7 @@ namespace TaxiAutoClicker.SMSActivateAPI
                 urlParams["country"] = "0";
 
                 Response response;
-                int maxTime = 5000;
+                int maxTime = 10000;
                 int pastTime = 0;
                 do
                 {
@@ -142,7 +142,7 @@ namespace TaxiAutoClicker.SMSActivateAPI
             Response response = SetStatus(1);
             if (response.Code == Response.ResponseCodes.ACCESS_READY)
             {
-                int maxTime = 200000;
+                int maxTime = 1200000; // 20 минут = 1200 секунд = 1200 000 миллисекунд
                 int pastTime = 0;
                 do
                 {
@@ -153,7 +153,20 @@ namespace TaxiAutoClicker.SMSActivateAPI
 
                 if (response.Code == Response.ResponseCodes.STATUS_OK)
                 {
-                    Code = response.Params[0].TrimStart(' ').Substring(0,4);
+                    if (!int.TryParse(
+                        response.Params[0].TrimStart(' ').Substring(0, 4),
+                        out int code))
+                    {
+                        if (response.Params.Length > 1)
+                        {
+                            if (!int.TryParse(
+                                response.Params[1].TrimStart(' ')
+                                    .Substring(0, 4),
+                                out code))
+                                response.IsError = true;
+                        }
+                    }
+                    Code = code.ToString().PadLeft(4, '0');
                 }
                 else
                 {

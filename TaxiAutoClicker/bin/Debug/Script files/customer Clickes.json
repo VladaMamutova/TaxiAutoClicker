@@ -1,0 +1,365 @@
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.5,
+    "Y": 0.5
+  },
+  "Description": "Click phone number field",
+  "Delay": 0
+}
+KeyboardInput
+{
+  "Description": "Enter phone number",
+  "Delay": 3500
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.5,
+    "Y": 0.940269768
+  },
+  "Description": "Click Next",
+  "Delay": 3000
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.317307681,
+    "Y": 0.190104172
+  },
+  "Description": "Click 1st field of code",
+  "Delay": 0
+}
+KeyboardInput
+{
+  "Description": "Enter code",
+  "Delay": 3000
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.5,
+    "Y": 0.296610177
+  },
+  "Description": "Click e-mail field",
+  "Delay": 1000
+}
+KeyboardInput
+{
+  "Description": "Enter e-mail",
+  "Delay": 1500
+}
+EnterPress
+{
+  "Description": "Press Enter",
+  "Delay": 700
+}
+KeyboardInput
+{
+  "Description": "Enter first name",
+  "Delay": 1500
+}
+EnterPress
+{
+  "Description": "Press Enter",
+  "Delay": 700
+}
+KeyboardInput
+{
+  "Description": "Enter last name",
+  "Delay": 1500
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.5,
+    "Y": 0.9441233
+  },
+  "Description": "Click Next",
+  "Delay": 6500
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.5,
+    "Y": 0.911016941
+  },
+  "Description": "Click Search destination",
+  "Delay": 2000
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.5,
+    "Y": 0.169491529
+  },
+  "Description": "Click Pickup location",
+  "Delay": 2000
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.9088542,
+    "Y": 0.169491529
+  },
+  "Description": "Click x in Pickup location Field",
+  "Delay": 1000
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.5,
+    "Y": 0.217514127
+  },
+  "Description": "Click Where to?",
+  "Delay": 2000
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.9114583,
+    "Y": 0.217514127
+  },
+  "Description": "Click x in Where to? Field",
+  "Delay": 1000
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.5,
+    "Y": 0.169491529
+  },
+  "Description": "Click Pickup location",
+  "Delay": 500
+}
+KeyboardInput
+{
+  "Description": "Enter address from",
+  "Delay": 2000
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.5,
+    "Y": 0.4081921
+  },
+  "Description": "Click address from",
+  "Delay": 500
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.5,
+    "Y": 0.217514127
+  },
+  "Description": "Click Where to?",
+  "Delay": 500
+}
+KeyboardInput
+{
+  "Description": "Enter address to",
+  "Delay": 4000
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.5,
+    "Y": 0.2881356
+  },
+  "Description": "Click address to",
+  "Delay": 7000
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.5,
+    "Y": 0.943159938
+  },
+  "Description": "Click Select Bolt",
+  "Delay": 5500
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.5,
+    "Y": 0.943159938
+  },
+  "Description": "Click Request Bolt",
+  "Delay": 1000
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.9,
+    "Y": 0.9375
+  },
+  "Description": "Click OK in messagebox (only once)",
+  "Delay": 14000
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.9270833,
+    "Y": 0.8615819
+  },
+  "Description": "Click chevron-up button",
+  "Delay": 2000
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.145833328,
+    "Y": 0.810734451
+  },
+  "Description": "Click Call",
+  "Delay": 4000
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.5,
+    "Y": 0.5706215
+  },
+  "Description": "DoubleClick to copy number",
+  "Delay": 2000
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 1.046875,
+    "Y": 0.8940678
+  },
+  "Description": "Click Home",
+  "Delay": 3500
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.6901042,
+    "Y": 0.564971745
+  },
+  "Description": "Click Bolt icon",
+  "Delay": 3000
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.8541667,
+    "Y": 0.806497157
+  },
+  "Description": "Click Cancel",
+  "Delay": 2000
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.5,
+    "Y": 0.960451961
+  },
+  "Description": "Click Cancel ride",
+  "Delay": 1500
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.5,
+    "Y": 1.0
+  },
+  "Description": "Click reason for cancellation",
+  "Delay": 1000
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 1.046875,
+    "Y": 0.8940678
+  },
+  "Description": "Click Home",
+  "Delay": 1000
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.875,
+    "Y": 0.9322034
+  },
+  "Description": "Click Settings icon",
+  "Delay": 3000
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.5,
+    "Y": 0.6073446
+  },
+  "Description": "Click applications in settings",
+  "Delay": 3000
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.5,
+    "Y": 0.262711853
+  },
+  "Description": "Click Bolt in applications",
+  "Delay": 3000
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.7317708,
+    "Y": 0.47033897
+  },
+  "Description": "Click Clear Data",
+  "Delay": 2000
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.7161458,
+    "Y": 0.627118647
+  },
+  "Description": "Click OK",
+  "Delay": 1500
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 1.046875,
+    "Y": 0.8940678
+  },
+  "Description": "Click Home",
+  "Delay": 1000
+}

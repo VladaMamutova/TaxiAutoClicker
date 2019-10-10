@@ -21,6 +21,16 @@ Click
     "Y": 0.940269768
   },
   "Description": "Click Next",
+  "Delay": 1500
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.317307681,
+    "Y": 0.190104172
+  },
+  "Description": "Click 1st field of code",
   "Delay": 0
 }
 KeyboardInput
@@ -181,7 +191,7 @@ Click
     "Y": 0.943159938
   },
   "Description": "Click Select Bolt",
-  "Delay": 2000
+  "Delay": 3000
 }
 Click
 {
@@ -191,7 +201,17 @@ Click
     "Y": 0.943159938
   },
   "Description": "Click Request Bolt",
-  "Delay": 15000
+  "Delay": 1000
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 0.9,
+    "Y": 0.9375
+  },
+  "Description": "Click OK in messagebox (only once)",
+  "Delay": 14000
 }
 Click
 {
@@ -228,7 +248,7 @@ Click
   "Position": {
     "IsEmpty": false,
     "X": 1.04797983,
-    "Y": 0.916552663
+    "Y": 0.921875
   },
   "Description": "Click Home",
   "Delay": 1500
@@ -278,7 +298,7 @@ Click
   "Position": {
     "IsEmpty": false,
     "X": 1.04797983,
-    "Y": 0.916552663
+    "Y": 0.921875
   },
   "Description": "Click Home",
   "Delay": 1000
@@ -332,14 +352,4 @@ Click
   },
   "Description": "Click OK",
   "Delay": 1500
-}
-Click
-{
-  "Position": {
-    "IsEmpty": false,
-    "X": 1.0476191,
-    "Y": 0.896081746
-  },
-  "Description": "Click Home",
-  "Delay": 1000
 }

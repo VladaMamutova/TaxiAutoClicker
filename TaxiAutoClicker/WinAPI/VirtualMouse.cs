@@ -32,26 +32,22 @@ namespace TaxiAutoClicker.WinAPI
 
         private static readonly Rectangle ScreenSize = Screen.PrimaryScreen.Bounds;
 
-        public static void SendMouseLeftClick(Point p)
+        private static readonly object Locker = new object();
+
+        public static void SendLeftClick(Point p)
         {
             int x = p.X * 65536 / ScreenSize.Width;
             int y = p.Y * 65536 / ScreenSize.Height;
-            
-            MouseEvent(MOUSEEVENTF.ABSOLUTE | MOUSEEVENTF.LEFTDOWN | MOUSEEVENTF.LEFTUP, x, y, 0, UIntPtr.Zero);
+            lock (Locker)
+            {
+                MouseEvent(MOUSEEVENTF.ABSOLUTE | MOUSEEVENTF.MOVE, x, y, 0,
+                    UIntPtr.Zero);
+                MouseEvent(
+                    MOUSEEVENTF.ABSOLUTE | MOUSEEVENTF.LEFTDOWN |
+                    MOUSEEVENTF.LEFTUP, x, y, 0, UIntPtr.Zero);
+            }
         }
 
-        public static void SendMouseMovement(Point p)
-        {
-            int x = p.X * 65536 / ScreenSize.Width;
-            int y = p.Y * 65536 / ScreenSize.Height;
-
-            MouseEvent(MOUSEEVENTF.ABSOLUTE | MOUSEEVENTF.MOVE, x, y, 0, UIntPtr.Zero);
-        }
-
-        void SendMouseRightClick(Point p)
-        {
-            MouseEvent(MOUSEEVENTF.RIGHTDOWN | MOUSEEVENTF.RIGHTUP, p.X, p.Y, 0, UIntPtr.Zero);
-        }
 
         public static void SendMouseDoubleClick(Point p)
         {
@@ -63,23 +59,13 @@ namespace TaxiAutoClicker.WinAPI
             MouseEvent(MOUSEEVENTF.LEFTDOWN | MOUSEEVENTF.LEFTUP, x, y, 0, UIntPtr.Zero);
         }
 
-        void SendMouseRightDoubleClick(Point p)
+        void SendRightClick(Point p)
         {
+            int x = p.X * 65536 / ScreenSize.Width;
+            int y = p.Y * 65536 / ScreenSize.Height;
+
+            MouseEvent(MOUSEEVENTF.ABSOLUTE | MOUSEEVENTF.MOVE, x, y, 0, UIntPtr.Zero);
             MouseEvent(MOUSEEVENTF.RIGHTDOWN | MOUSEEVENTF.RIGHTUP, p.X, p.Y, 0, UIntPtr.Zero);
-
-            Thread.Sleep(150);
-
-            MouseEvent(MOUSEEVENTF.RIGHTDOWN | MOUSEEVENTF.RIGHTUP, p.X, p.Y, 0, UIntPtr.Zero);
-        }
-
-        void SendMouseDown()
-        {
-            MouseEvent(MOUSEEVENTF.LEFTDOWN, 50, 50, 0, UIntPtr.Zero);
-        }
-
-        void SendMouseUp()
-        {
-            MouseEvent(MOUSEEVENTF.LEFTUP, 50, 50, 0, UIntPtr.Zero);
         }
     }
 }

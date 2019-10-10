@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TaxiAutoClicker"
         mc:Ignorable="d"
-        Title="ClickManagerWindow" Height="500" Width="590" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" FontSize="14" Loaded="ClickManagerWindow_OnLoaded">
+        Title="Click Manager" Height="500" Width="590" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" FontSize="14" Loaded="ClickManagerWindow_OnLoaded">
     <Grid Margin="15 15 15 15">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>

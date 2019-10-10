@@ -5,18 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="TaxiAutoClicker" FontSize="14" SizeToContent="Height" Width="310" 
-        ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Closed="MainWindow_OnClosed">
+        ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Loaded="MainWindow_OnLoaded" Closed="MainWindow_OnClosed">
     <Grid>
         <StackPanel>
             <Menu Height="25">
                 <MenuItem Header="Настройки" Padding="15 3 15 3">
                     <MenuItem Header="Управление кликами..." Click="ManageClicksWindow_Click"></MenuItem>
                 </MenuItem>
+                <MenuItem Header="Справка" Padding="15 3 15 3" Click="OpenHelp_Click"></MenuItem>
             </Menu>
             <StackPanel Margin="15 15 15 15">
                 <Grid Margin="0 0 5 0">
                     <TextBlock Text="API-ключ для sms-activate.ru:" Margin="0 2 0 0"/>
-                    <Button Style="{StaticResource APIPasteButton}" ToolTip="Вставить Api-ключ" HorizontalAlignment="Right" Click="PasteApi_OnClick"></Button>
+                    <Button Style="{StaticResource APIPasteButton}" ToolTip="Вставить API-ключ" HorizontalAlignment="Right" Click="PasteApi_OnClick"></Button>
                 </Grid>
                 <TextBox Name="APIKeyTextBox" Padding="5" Margin="0 5 0 7"/>
                 <TextBlock Text="Почтовый адрес:"/>
@@ -24,7 +25,7 @@
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="0.7*"></ColumnDefinition>
-                        <ColumnDefinition Width="5"></ColumnDefinition>
+                        <ColumnDefinition Width="8"></ColumnDefinition>
                         <ColumnDefinition></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <StackPanel>
@@ -36,6 +37,22 @@
                         <TextBox Name="LastName" Padding="5" Margin="0 5 0 7"/>
                     </StackPanel>
                 </Grid>
+                <Expander Name="LaunchActionsExpander" IsExpanded="False" Margin="0 0 0 7">
+                    <Expander.Header>
+                        <TextBlock Name="ExpanderText" TextWrapping="Wrap" Text="Запустить полный цикл заказа такси"></TextBlock>
+                    </Expander.Header>
+                    <StackPanel Margin="23 7 0 0">
+                        <CheckBox Name="RegistrationCheckBox" Content="Запустить регистрацию в Bolt" Margin="0 0 0 7" Checked="ToggleButton_OnChanged" Unchecked="ToggleButton_OnChanged"></CheckBox>
+                        <CheckBox Name="OrderingATaxiCheckBox" Margin="0 0 0 7" Checked="ToggleButton_OnChanged" Unchecked="ToggleButton_OnChanged">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Запустить"></TextBlock>
+                                <TextBox Name="LaunchCount" Width="30" Margin="5 0" HorizontalContentAlignment="Center" KeyDown="LaunchCount_OnKeyDown" TextChanged="LaunchCount_OnTextChanged"></TextBox>
+                                <TextBlock Text="вызовов такси"></TextBlock>
+                            </StackPanel>
+                        </CheckBox>
+                        <CheckBox Name="ClearindDataCheckBox" Content="Запустить очистку данных в Bolt" Margin="0 0 0 7" Checked="ToggleButton_OnChanged" Unchecked="ToggleButton_OnChanged"></CheckBox>
+                    </StackPanel>
+                </Expander>
                 <Button Name="LaunchButton" Style="{StaticResource PrimaryButton}" ContentStringFormat="Запустить заказ такси" Margin="0 5 0 0"
                     ToolTip="Автокликер будет запущен в каждом открытом окне NoxPlayer" Click="LaunchAutoClicker_Click">
                 </Button>

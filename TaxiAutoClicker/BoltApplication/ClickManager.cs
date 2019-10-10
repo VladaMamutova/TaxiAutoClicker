@@ -21,12 +21,12 @@ namespace TaxiAutoClicker.BoltApplication
         public Dictionary<int, KeyboardInput> KeyboardInputs { get; }
         public Dictionary<int, EnterPress> EnterPresses { get; }
 
-        public int RegistrationActionsCount { get; } = 11;
-        public int TaxiOrderingActionsCount { get; } = 21;
+        public int RegistrationActionsCount { get; } = 12;
+        public int TaxiOrderingActionsCount { get; } = 22;
         public int DataCleaningActionsCount { get; } = 7;
 
-        public int BoltIconKey { get; } = 28;
-        public int SettingsIconKey { get; } = 33;
+        public int BoltIconKey { get; } = 30;
+        public int SettingsIconKey { get; } = 35;
 
         public int ActionsCount => RegistrationActionsCount +
                                    TaxiOrderingActionsCount +
@@ -300,9 +300,10 @@ namespace TaxiAutoClicker.BoltApplication
             EnterPresses.Clear();
 
             int number = 0;
-            RegistrationClicks.Add(number++, new Click(new PointF(0.5f, 0.5f), "Click phone number field", 0));
+            RegistrationClicks.Add(number++, new Click(new PointF(0.5f, 0.5f), "Click phone number field", 500));
             KeyboardInputs.Add(number++, new KeyboardInput("Enter phone number", 1000));
-            RegistrationClicks.Add(number++, new Click(new PointF(0.5f, 0.940269768f), "Click Next", 0));
+            RegistrationClicks.Add(number++, new Click(new PointF(0.5f, 0.940269768f), "Click Next", 1500));
+            RegistrationClicks.Add(number++, new Click(new PointF(0.317307681f, 0.190104172f), "Click 1st field of code", 0));
             KeyboardInputs.Add(number++, new KeyboardInput("Enter code", 3000));
             RegistrationClicks.Add(number++, new Click(new PointF(0.5f, 0.274566472f), "Click e-mail field", 1000));
             KeyboardInputs.Add(number++, new KeyboardInput("Enter e-mail", 1500));
@@ -323,24 +324,25 @@ namespace TaxiAutoClicker.BoltApplication
             TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.201094389f), "Click Where to?", 500));
             KeyboardInputs.Add(number++, new KeyboardInput("Enter address to", 1500));
             TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.254335254f), "Click address to", 7000));
-            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.943159938f), "Click Select Bolt", 2000));
-            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.943159938f), "Click Request Bolt", 15000));
+            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.943159938f), "Click Select Bolt", 3000));
+            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.943159938f), "Click Request Bolt", 1000));
+            TaxiOrderingClicks.Add(number++, new Click(new PointF(0.9f, 0.9375f), "Click OK in messagebox (only once)", 14000));
             TaxiOrderingClicks.Add(number++, new Click(new PointF(0.92957747f, 0.8795761f), "Click chevron-up button", 1500));
             TaxiOrderingClicks.Add(number++, new Click(new PointF(0.125f, 0.8265896f), "Click Call", 3000));
             TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.653179169f), "DoubleClick to copy number", 1500));
-            TaxiOrderingClicks.Add(number++, new Click(new PointF(1.04797983f, 0.896081746f), "Click Home", 1500));
+            TaxiOrderingClicks.Add(number++, new Click(new PointF(1.04797983f, 0.921875f), "Click Home", 1500));
             TaxiOrderingClicks.Add(number++, new Click(new PointF(0.6919014f, 0.383429676f), "Click Bolt icon", 3000));
             TaxiOrderingClicks.Add(number++, new Click(new PointF(0.8556338f, 0.8265896f), "Click Cancel", 1500));
             TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 0.9633911f), "Click Cancel ride", 1000));
             TaxiOrderingClicks.Add(number++, new Click(new PointF(0.5f, 1.0f), "Click reason for cancellation", 1000));
             
-            DataCleaningClicks.Add(number++, new Click(new PointF(1.04797983f, 0.896081746f), "Click Home", 1000));
+            DataCleaningClicks.Add(number++, new Click(new PointF(1.04797983f, 0.921875f), "Click Home", 1000));
             DataCleaningClicks.Add(number++, new Click(new PointF(0.8863636f, 0.3857729f), "Click Settings icon", 3000));
             DataCleaningClicks.Add(number++, new Click(new PointF(0.5f, 0.760601938f), "Click applications in settings", 1500));
             DataCleaningClicks.Add(number++, new Click(new PointF(0.5f, 0.24897401f), "Click Bolt in applications", 3000));
             DataCleaningClicks.Add(number++, new Click(new PointF(0.7323232f, 0.432284534f), "Click Clear Data", 1000));
             DataCleaningClicks.Add(number++, new Click(new PointF(0.7929293f, 0.6019152f), "Click OK", 1500));
-            DataCleaningClicks.Add(number, new Click(new PointF(1.04797983f, 0.896081746f), "Click Home", 1000));
+            DataCleaningClicks.Add(number, new Click(new PointF(1.04797983f, 0.921875f), "Click Home", 1000));
         }
     }
 }

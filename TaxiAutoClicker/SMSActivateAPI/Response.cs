@@ -35,7 +35,7 @@
         
         public Response(string getRequest)
         {
-            Text = "";
+            Text = getRequest;
             IsError = true;
             Params = null;
 

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace TaxiAutoClicker.WinAPI
 {
     class VirtualKeyboard
     {
         private const int WM_CHAR = 0x0102;
+        public const int WM_SYSUP = 0x0105;
         private const byte VK_CONTROL = 0x11;
         private const byte VK_RETURN = 0x0D;
         private const int KEYEVENTF_EXTENDEDKEY = 0x1;
@@ -17,11 +19,39 @@ namespace TaxiAutoClicker.WinAPI
         [DllImport("user32.dll")]
         static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
 
+        private static readonly object Locker = new object();
+
         public static void PrintText(IntPtr hWnd, string text)
         {
-            foreach (var symb in text)
+            lock (Locker)
             {
-                PostMessage(hWnd, WM_CHAR, (IntPtr) symb, (IntPtr) 0);
+                foreach (var symb in text)
+                {
+                    PostMessage(hWnd, WM_CHAR, (IntPtr) symb, (IntPtr) 0);
+                }
+            }
+        }
+
+        public static void PrintNumber(IntPtr hWnd, string text)
+        {
+            lock (Locker)
+            {
+                foreach (var symb in text)
+                {
+                    PostMessage(hWnd, WM_SYSUP, (IntPtr) symb, (IntPtr) 0);
+                }
+            }
+        }
+
+        public static void PrintNumber(IntPtr hWnd, string text, int delay)
+        {
+            lock (Locker)
+            {
+                foreach (var symb in text)
+                {
+                    PostMessage(hWnd, WM_SYSUP, (IntPtr)symb, (IntPtr)0);
+                    Thread.Sleep(delay);
+                }
             }
         }
 
