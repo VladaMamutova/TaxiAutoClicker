@@ -18,6 +18,8 @@ namespace TaxiAutoClicker.BoltApplication
         private readonly int _width;
         private readonly int _height;
 
+        private static readonly object DataInputLocker = new object();
+
         public IntPtr Handle { get; }
 
         public static string AddressesFilePath { get; } =
@@ -38,6 +40,7 @@ namespace TaxiAutoClicker.BoltApplication
                 else Interlocked.CompareExchange(ref _threadSafeBoolBackValue, 0, 1);
             }
         }
+
         public WindowManager(IntPtr handle, User user)
         {
             Handle = handle;
@@ -67,10 +70,10 @@ namespace TaxiAutoClicker.BoltApplication
                                        _clickManager.RegistrationClicks[i]
                                            .Position
                                            .Y) + _leftTop.Y;
-                        while (ThreadSafeBool)
-                        {
-                            Thread.Sleep(100);
-                        }
+                        //while (ThreadSafeBool)
+                        //{
+                        //    Thread.Sleep(100);
+                        //}
                         VirtualMouse.SendLeftClick(new Point(x, y));
                         Thread.Sleep(_clickManager.RegistrationClicks[i].Delay);
                     }
@@ -78,10 +81,17 @@ namespace TaxiAutoClicker.BoltApplication
                 else if (_clickManager.KeyboardInputs.ContainsKey(i))
                 {
                     Response response;
-                    string input = "";
-                    switch (_clickManager.KeyboardInputs[i].Description)
+                    string description =
+                        _clickManager.KeyboardInputs[i].Description;
+                    if (description == "Enter phone number")
                     {
-                        case "Enter phone number":
+                        //while (ThreadSafeBool)
+                        //{
+                        //    Thread.Sleep(500);
+                        //}
+
+                        //ThreadSafeBool = true;
+                        //lock (DataInputLocker)
                         {
                             response = _profile.GetNumber();
                             if (response.IsError)
@@ -91,96 +101,108 @@ namespace TaxiAutoClicker.BoltApplication
                                     response.Code);
                             }
 
-                            input = _profile.Number;
-                            break;
+                            VirtualKeyboard.PrintText(Handle, _profile.Number);
+                            Thread.Sleep(_clickManager.KeyboardInputs[i].Delay);
+
+                            i++;
+                            var x = (int)(_width * _clickManager
+                                              .RegistrationClicks[i]
+                                              .Position.X) + _leftTop.X;
+                            var y = (int)(_height * _clickManager
+                                              .RegistrationClicks[i]
+                                              .Position.Y) + _leftTop.Y;
+
+                            VirtualMouse.SendLeftClick(new Point(x, y));
+                            Thread.Sleep(_clickManager.RegistrationClicks[i].Delay);
                         }
-                        case "Enter code":
+
+                        //ThreadSafeBool = false;
+                    }
+                    else if (description == "Enter code")
+                    {
+                        response = _profile.GetCode();
+                        if (response.IsError)
                         {
-                            response = _profile.GetCode();
-                            if (response.IsError)
-                            {
-                                throw new Exception(
-                                    "Не удалось получить код на виртуальный номер: " +
-                                    response.Code);
-                            }
+                            throw new Exception(
+                                "Не удалось получить код на виртуальный номер: " +
+                                response.Code);
+                        }
 
-                            Thread.Sleep(300);
+                        // Непосредственно перед вводом данным кликаем по полю,
+                        // в случае если оно стало неактивным вследствие
+                        // действий пользователя или работы нескольких потоков
+                        // с несколькими окнами.
 
+                        var x = (int) (_width * _clickManager
+                                           .RegistrationClicks[i - 1].Position
+                                           .X) + _leftTop.X;
+                        var y = (int) (_height * _clickManager
+                                           .RegistrationClicks[i - 1].Position
+                                           .Y) + _leftTop.Y;
+                        VirtualMouse.SendLeftClick(new Point(x, y));
+                        Thread.Sleep(300);
+                        VirtualKeyboard.PrintNumber(Handle, _profile.Code, 500);
+                        Thread.Sleep(_clickManager.KeyboardInputs[i].Delay);
+                    }
+                    else if (description == "Enter e-mail")
+                    {
+                        while (ThreadSafeBool)
+                        {
+                            Thread.Sleep(500);
+                        }
+
+                        ThreadSafeBool = true;
+                        lock (DataInputLocker)
+                        {
                             // Непосредственно перед вводом данным кликаем по полю,
                             // в случае если оно стало неактивным вследствие
                             // действий пользователя или работы нескольких потоков
                             // с несколькими окнами.
+                            var x = (int)(_width * _clickManager
+                                              .RegistrationClicks[i - 1]
+                                              .Position.X) + _leftTop.X;
+                            var y = (int)(_height * _clickManager
+                                              .RegistrationClicks[i - 1]
+                                              .Position.Y) + _leftTop.Y;
 
-                            var x = (int) (_width * _clickManager.RegistrationClicks[i - 1]
-                                               .Position.X) + _leftTop.X;
-                            var y = (int) (_height * _clickManager.RegistrationClicks[i - 1]
-                                               .Position.Y) + _leftTop.Y;
                             VirtualMouse.SendLeftClick(new Point(x, y));
-
-                            VirtualKeyboard.PrintNumber(Handle, _profile.Code,
-                                500);
-
-                            input = "";
-
-                            break;
-                        }
-                        case "Enter e-mail":
-                        {
-                            // Блокируем остальные потоки на время ввода всех
-                            // регистрационных данных.
-                            while (ThreadSafeBool)
+                            VirtualKeyboard.PrintText(Handle, _user.Mail);
+                            Thread.Sleep(_clickManager.KeyboardInputs[i].Delay);
+                            i++;
+                            for (int j = 0; j < 5; j++)
                             {
-                                Thread.Sleep(100);
+                                if (_clickManager.KeyboardInputs.ContainsKey(i))
+                                {
+                                    string input = "";
+                                    if (_clickManager.KeyboardInputs[i]
+                                            .Description == "Enter first name")
+                                    {
+                                        input = _user.FirstName;
+                                    }
+                                    else if (_clickManager.KeyboardInputs[i]
+                                                 .Description ==
+                                             "Enter last name")
+                                    {
+                                        input = _user.Surname;
+                                    }
+
+                                    VirtualKeyboard.PrintText(Handle, input);
+                                    Thread.Sleep(_clickManager.KeyboardInputs[i]
+                                        .Delay);
+                                }
+                                else if (_clickManager.EnterPresses.ContainsKey(
+                                    i))
+                                {
+                                    VirtualKeyboard.PressEnter();
+                                    Thread.Sleep(_clickManager.EnterPresses[i]
+                                        .Delay);
+                                }
+
+                                i++;
                             }
-
-                            ThreadSafeBool = true;
-
-                            // Непосредственно перед вводом данным кликаем по полю,
-                            // в случае если оно стало неактивным вследствие
-                            // действий пользователя или работы нескольких потоков
-                            // с несколькими окнами.
-                            var x = (int) (_width * _clickManager
-                                               .RegistrationClicks[i - 1]
-                                               .Position.X) + _leftTop.X;
-                            var y = (int) (_height * _clickManager
-                                               .RegistrationClicks[i - 1]
-                                               .Position.Y) + _leftTop.Y;
-                            VirtualMouse.SendLeftClick(new Point(x, y));
-
-                            input = _user.Mail;
-                            break;
                         }
-                        case "Enter first name":
-                        {
-                            input = _user.FirstName;
-                            break;
-                        }
-                        case "Enter last name":
-                        {
-                            input = _user.Surname;
-                            break;
-                        }
-                    }
 
-                    if (!string.IsNullOrEmpty(input))
-                    {
-                        VirtualKeyboard.PrintText(Handle, input);
-                    }
-
-                    // При последнем вводе данных снимаем блокировку потоков.
-                    if (_clickManager.KeyboardInputs[i].Description ==
-                        "Enter last name")
-                    {
                         ThreadSafeBool = false;
-                    }
-
-                    Thread.Sleep(_clickManager.KeyboardInputs[i].Delay);
-
-                    if (_clickManager.EnterPresses.ContainsKey(i+1))
-                    {
-                        i++;
-                        VirtualKeyboard.PressEnter();
-                        Thread.Sleep(_clickManager.EnterPresses[i].Delay);
                     }
                 }
                 else
@@ -314,7 +336,6 @@ namespace TaxiAutoClicker.BoltApplication
 
         public void ClearDataInBolt()
         {
-
             int startIndex = _clickManager.RegistrationActionsCount + _clickManager.TaxiOrderingActionsCount;
             for (int i = startIndex;
                 i < _clickManager.DataCleaningActionsCount + startIndex;

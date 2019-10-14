@@ -6,7 +6,7 @@ Click
     "Y": 0.5
   },
   "Description": "Click phone number field",
-  "Delay": 0
+  "Delay": 2000
 }
 KeyboardInput
 {
@@ -18,7 +18,7 @@ Click
   "Position": {
     "IsEmpty": false,
     "X": 0.5,
-    "Y": 0.940269768
+    "Y": 0.9505208
   },
   "Description": "Click Next",
   "Delay": 1500
@@ -46,7 +46,7 @@ Click
     "Y": 0.274566472
   },
   "Description": "Click e-mail field",
-  "Delay": 1000
+  "Delay": 1700
 }
 KeyboardInput
 {
@@ -78,7 +78,7 @@ Click
   "Position": {
     "IsEmpty": false,
     "X": 0.5,
-    "Y": 0.9441233
+    "Y": 0.9505208
   },
   "Description": "Click Next",
   "Delay": 4500
@@ -352,4 +352,14 @@ Click
   },
   "Description": "Click OK",
   "Delay": 1500
+}
+Click
+{
+  "Position": {
+    "IsEmpty": false,
+    "X": 1.04797983,
+    "Y": 0.921875
+  },
+  "Description": "Click Home",
+  "Delay": 1000
 }

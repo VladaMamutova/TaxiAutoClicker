@@ -32,17 +32,6 @@ namespace TaxiAutoClicker.WinAPI
             }
         }
 
-        public static void PrintNumber(IntPtr hWnd, string text)
-        {
-            lock (Locker)
-            {
-                foreach (var symb in text)
-                {
-                    PostMessage(hWnd, WM_SYSUP, (IntPtr) symb, (IntPtr) 0);
-                }
-            }
-        }
-
         public static void PrintNumber(IntPtr hWnd, string text, int delay)
         {
             lock (Locker)

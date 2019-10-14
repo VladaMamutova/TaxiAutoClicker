@@ -219,7 +219,7 @@ namespace TaxiAutoClicker.BoltApplication
                 using (StreamReader sr = new StreamReader(fs, Encoding.Default))
                 {
                     int actionsCount = 0;
-                    while (!sr.EndOfStream)
+                    while (!sr.EndOfStream && actionsCount < ActionsCount)
                     {
                         if (Enum.TryParse(sr.ReadLine(), out Actions action))
                         {
@@ -300,7 +300,7 @@ namespace TaxiAutoClicker.BoltApplication
             EnterPresses.Clear();
 
             int number = 0;
-            RegistrationClicks.Add(number++, new Click(new PointF(0.5f, 0.5f), "Click phone number field", 500));
+            RegistrationClicks.Add(number++, new Click(new PointF(0.5f, 0.5f), "Click phone number field", 1000));
             KeyboardInputs.Add(number++, new KeyboardInput("Enter phone number", 1000));
             RegistrationClicks.Add(number++, new Click(new PointF(0.5f, 0.940269768f), "Click Next", 1500));
             RegistrationClicks.Add(number++, new Click(new PointF(0.317307681f, 0.190104172f), "Click 1st field of code", 0));
