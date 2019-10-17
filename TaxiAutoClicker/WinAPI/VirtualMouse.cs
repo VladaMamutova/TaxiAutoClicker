@@ -54,9 +54,13 @@ namespace TaxiAutoClicker.WinAPI
             int x = p.X * 65536 / ScreenSize.Width;
             int y = p.Y * 65536 / ScreenSize.Height;
 
-            MouseEvent(MOUSEEVENTF.LEFTDOWN | MOUSEEVENTF.LEFTUP, x, y, 0, UIntPtr.Zero);
+            MouseEvent(MOUSEEVENTF.ABSOLUTE | MOUSEEVENTF.MOVE, x, y, 0,
+                UIntPtr.Zero);
+            MouseEvent(MOUSEEVENTF.LEFTDOWN | MOUSEEVENTF.LEFTUP, x, y, 0,
+                UIntPtr.Zero);
             Thread.Sleep(150);
-            MouseEvent(MOUSEEVENTF.LEFTDOWN | MOUSEEVENTF.LEFTUP, x, y, 0, UIntPtr.Zero);
+            MouseEvent(MOUSEEVENTF.LEFTDOWN | MOUSEEVENTF.LEFTUP, x, y, 0,
+                UIntPtr.Zero);
         }
 
         void SendRightClick(Point p)

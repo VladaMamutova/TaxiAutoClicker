@@ -51,7 +51,7 @@ Click
 KeyboardInput
 {
   "Description": "Enter e-mail",
-  "Delay": 1500
+  "Delay": 2000
 }
 EnterPress
 {
@@ -98,10 +98,10 @@ Click
   "Position": {
     "IsEmpty": false,
     "X": 0.5,
-    "Y": 0.153214768
+    "Y": 0.151702791
   },
   "Description": "Click Pickup location",
-  "Delay": 1000
+  "Delay": 1500
 }
 Click
 {
@@ -111,7 +111,7 @@ Click
     "Y": 0.153214768
   },
   "Description": "Click x in Pickup location Field",
-  "Delay": 500
+  "Delay": 700
 }
 Click
 {
@@ -121,7 +121,7 @@ Click
     "Y": 0.201094389
   },
   "Description": "Click Where to?",
-  "Delay": 1000
+  "Delay": 1500
 }
 Click
 {
@@ -131,7 +131,7 @@ Click
     "Y": 0.201094389
   },
   "Description": "Click x in Where to? Field",
-  "Delay": 500
+  "Delay": 700
 }
 Click
 {
@@ -341,7 +341,7 @@ Click
     "Y": 0.432284534
   },
   "Description": "Click Clear Data",
-  "Delay": 1000
+  "Delay": 1500
 }
 Click
 {

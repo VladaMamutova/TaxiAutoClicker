@@ -60,8 +60,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ActionItem.cs" />
-    <Compile Include="BoltApplication\WindowManager.cs" />
+    <Compile Include="BoltApplication\Log.cs" />
     <Compile Include="BoltApplication\User.cs" />
+    <Compile Include="BoltApplication\WindowRectangle.cs" />
+    <Compile Include="BoltApplication\WindowsManager.cs" />
     <Compile Include="ClickManagerWindow.xaml.cs">
       <DependentUpon>ClickManagerWindow.xaml</DependentUpon>
     </Compile>
@@ -71,6 +73,7 @@
     <Compile Include="InputActions\KeyboardInput.cs" />
     <Compile Include="SMSActivateAPI\Profile.cs" />
     <Compile Include="SMSActivateAPI\Response.cs" />
+    <Compile Include="WinAPI\KeyHook.cs" />
     <Compile Include="WinAPI\VirtualKeyboard.cs" />
     <Compile Include="WinAPI\VirtualMouse.cs" />
     <Compile Include="WinAPI\WindowService.cs" />

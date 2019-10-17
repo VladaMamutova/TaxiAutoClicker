@@ -20,21 +20,22 @@ namespace TaxiAutoClicker
     public partial class MainWindow : Window
     {
         private User _boltUser;
-        private readonly List<Thread> _orderingThreads;
+        private Thread _clickerThread;
+        private Thread _keyHookThread;
 
         public MainWindow()
         {
             InitializeComponent();
-            _orderingThreads = new List<Thread>();
+            Log.CreateNew();
         }
 
         private void LaunchAutoClicker_Click(object sender, RoutedEventArgs e)
         {
             if (RegistrationCheckBox.IsChecked == true &&
                 (string.IsNullOrEmpty(APIKeyTextBox.Text) ||
-                string.IsNullOrEmpty(Mail.Text) ||
-                string.IsNullOrEmpty(FirstName.Text) ||
-                string.IsNullOrEmpty(LastName.Text)))
+                 string.IsNullOrEmpty(Mail.Text) ||
+                 string.IsNullOrEmpty(FirstName.Text) ||
+                 string.IsNullOrEmpty(LastName.Text)))
             {
                 MessageBox.Show("Заполните все поля.", Title);
                 return;
@@ -43,49 +44,122 @@ namespace TaxiAutoClicker
             IntPtr[] windows = WindowService
                 .FindWindowsWithText("NoxPlayer").ToArray();
 
+            if(windows.Length == 0) return;
+            
             _boltUser = new User(APIKeyTextBox.Text, Mail.Text,
                 FirstName.Text, LastName.Text);
             bool needToRegister = RegistrationCheckBox.IsChecked == true;
             bool needToOrderATaxi = OrderingATaxiCheckBox.IsChecked == true;
             int.TryParse(LaunchCount.Text, out int launchCount);
             bool needToClearData = ClearindDataCheckBox.IsChecked == true;
-            
+
+            WindowsManager manager = new WindowsManager(_boltUser);
+            string names = "";
             foreach (var window in windows)
             {
-                WindowManager windowManager =
-                    new WindowManager(window, _boltUser);
-
-                Thread orderThread = new Thread(() =>
+                manager.AddWindow(window);
+                if (!string.IsNullOrEmpty(names))
                 {
-                    try
-                    {
-                        if (needToRegister) windowManager.RegisterInBolt();
-                        if (needToOrderATaxi)
-                        {
-                            for (int i = 0; i < launchCount; i++)
-                            {
-                                windowManager.OrderATaxi();
-                                Thread.Sleep(2500);
-                            }
-                        }
-                        if(needToClearData) windowManager.ClearDataInBolt();
-                    }
-                    catch (ThreadAbortException) { }
-                    catch (Exception ex)
-                    {
-                        Dispatcher?.Invoke(() =>
-                        {
-                            MessageBox.Show(ex.Message, Title);
-                        });
-                    }
-                });
-                orderThread.SetApartmentState(ApartmentState.STA);
-                orderThread.Start();
-                _orderingThreads.Add(orderThread);
-                Thread.Sleep(200);
+                    names += ", ";
+                }
+                names += WindowService.GetWindowText(window);
             }
+
+            string actions = "";
+            if(needToRegister) actions += "регистрация";
+            if (needToOrderATaxi)
+            {
+                actions += ((!string.IsNullOrEmpty(actions) ? " + " : "") + launchCount + " заказов такси");
+            }
+
+            if (needToClearData)
+            {
+                actions += ((!string.IsNullOrEmpty(actions) ? " + " : "") + "очистка данных");
+            }
+
+            Log.Add("Автокликер запущен в " + windows.Length +
+                      " окнах; окна: " + names + ", действия: " + actions +
+                      ".");
+
+            KeyHook.Register();
+            _keyHookThread = new Thread(StartKeyHook);
+            _keyHookThread.SetApartmentState(ApartmentState.STA);
+            _keyHookThread.Start();
+
+            LaunchButton.ContentStringFormat =
+                "Остановить (Esc)";
+            LaunchButton.ToolTip = "";
+
+            _clickerThread = new Thread(() =>
+            {
+                try
+                {
+                    if (needToRegister)
+                    {
+                        manager.RegisterInBolt();
+                    }
+
+                    if (needToOrderATaxi)
+                    {
+                        for (int i = 0; i < launchCount; i++)
+                        {
+                            manager.OrderATaxi();
+                            Thread.Sleep(3000);
+                        }
+                    }
+
+                    if (needToClearData)
+                    {
+                        manager.ClearDataInBolt();
+                    }
+
+                    if (_keyHookThread != null && _keyHookThread.IsAlive)
+                    {
+                        _keyHookThread.Abort();
+                    }
+
+                    Log.Add("Работа кликера завершена.");
+                }
+                catch (ThreadAbortException)
+                {
+                    Log.Add("Работа кликера остановлена.");
+                }
+                catch (Exception ex)
+                {
+                    Log.Add("Работа кликера была некорректно завершена: " + ex.Message + ".");
+                }
+                finally
+                {
+                    Dispatcher?.Invoke(() =>
+                        {
+                            LaunchButton.ContentStringFormat =
+                                "Запустить заказ такси";
+                            LaunchButton.ToolTip = "Автокликер будет запущен в каждом открытом окне NoxPlayer.";
+                        });
+                }
+            });
+            _clickerThread.SetApartmentState(ApartmentState.STA);
+            _clickerThread.Start();
         }
 
+        private void StartKeyHook()
+        {
+            while (!KeyHook.EscPressed)
+            {
+                Thread.Sleep(10);
+            }
+
+            KeyHook.Unregister();
+            if (_clickerThread != null && _clickerThread.IsAlive)
+            {
+                _clickerThread.Abort();
+            }
+
+            Dispatcher?.Invoke(() =>
+            {
+                MessageBox.Show("Работа кликера оставновлена.", Title);
+            });
+        }
 
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
@@ -106,12 +180,14 @@ namespace TaxiAutoClicker
 
         private void MainWindow_OnClosed(object sender, EventArgs e)
         {
-            foreach (var thread in _orderingThreads)
+            if (_clickerThread != null && _clickerThread.IsAlive)
             {
-                if (thread != null && thread.IsAlive)
-                {
-                    thread.Abort();
-                }
+                _clickerThread.Abort();
+            }
+
+            if (_keyHookThread != null && _keyHookThread.IsAlive)
+            {
+                _keyHookThread.Abort();
             }
         }
 
@@ -124,7 +200,7 @@ namespace TaxiAutoClicker
         }
 
         private void ManageClicksWindow_Click(object sender, RoutedEventArgs e)
-        {
+        {   
             ClickManagerWindow window = new ClickManagerWindow {Owner = this};
             if (window.ShowDialog() == true)
             {

@@ -6,7 +6,7 @@ namespace TaxiAutoClicker.SMSActivateAPI
     class Profile
     {
         private const string Url = "http://sms-activate.ru/stubs/handler_api.php";  // Ссылка для запросов
-        private string Api;  // Токен, использующийся при запросах
+        private readonly string _api;  // Токен, использующийся при запросах
         public string Balance;
         public string Number;
         public string ActivationId;
@@ -14,7 +14,7 @@ namespace TaxiAutoClicker.SMSActivateAPI
 
         public Profile(string accessToken)
         {
-            Api = accessToken;
+            _api = accessToken;
         }
 
         /// <summary>
@@ -26,10 +26,11 @@ namespace TaxiAutoClicker.SMSActivateAPI
             //http://sms-activate.ru/stubs/handler_api.php?api_key=$api_key&action=getBalance
             using (var request = new HttpRequest())
             {
-                var urlParams = new RequestParams();
+                var urlParams = new RequestParams
+                {
+                    ["api_key"] = _api, ["action"] = "getBalance"
+                };
 
-                urlParams["api_key"] = Api;
-                urlParams["action"] = "getBalance";
 
                 Response response =
                     new Response(request.Get(Url, urlParams).ToString());
@@ -52,14 +53,18 @@ namespace TaxiAutoClicker.SMSActivateAPI
             // http://sms-activate.ru/stubs/handler_api.php?api_key=$api_key&action=getNumber&service=$service&forward=$forward&operator=$operator&ref=$ref&country=$country
             using (var request = new HttpRequest())
             {
-                var urlParams = new RequestParams();
+                var urlParams = new RequestParams
+                {
+                    ["api_key"] = _api,
+                    ["action"] = "getNumber",
+                    ["service"] = "ot",
+                    ["forward"] = "0",
+                    ["operator"] = "megafon",
+                    ["country"] = "0"
+                };
 
-                urlParams["api_key"] = Api;
-                urlParams["action"] = "getNumber";
-                urlParams["service"] = "ot"; // Любой другой сервис.
-                urlParams["forward"] = "0"; // Не выполнять переадресацию.
-                urlParams["operator"] = "megafon";
-                urlParams["country"] = "0";
+                // Любой другой сервис.
+                // Не выполнять переадресацию.
 
                 Response response;
                 int maxTime = 10000;
@@ -91,12 +96,14 @@ namespace TaxiAutoClicker.SMSActivateAPI
             // http://sms-activate.ru/stubs/handler_api.php?api_key=$api_key&action=getStatus&id=$id
             using (var request = new HttpRequest())
             {
-                var urlParams = new RequestParams();
+                var urlParams = new RequestParams
+                {
+                    ["api_key"] = _api,
+                    ["action"] = "getStatus",
+                    ["id"] = ActivationId
+                };
 
-                urlParams["api_key"] = Api;
-                urlParams["action"] = "getStatus";
-                urlParams["id"] = ActivationId;
-                
+
                 return new Response(request.Get(Url, urlParams).ToString());
             }
         }
@@ -113,12 +120,15 @@ namespace TaxiAutoClicker.SMSActivateAPI
             // http://sms-activate.ru/stubs/handler_api.php?api_key=$api_key&action=setStatus&status=$status&id=$id&forward=$forward
             using (var request = new HttpRequest())
             {
-                var urlParams = new RequestParams();
+                var urlParams = new RequestParams
+                {
+                    ["api_key"] = _api,
+                    ["action"] = "setStatus",
+                    ["status"] = status.ToString(),
+                    ["id"] = ActivationId
+                };
 
-                urlParams["api_key"] = Api;
-                urlParams["action"] = "setStatus";
-                urlParams["status"] = status.ToString();
-                urlParams["id"] = ActivationId; // Не выполнять переадресацию.
+                // Не выполнять переадресацию.
                 //urlParams["forward"] = "0";
 
                 return new Response(request.Get(Url, urlParams).ToString());

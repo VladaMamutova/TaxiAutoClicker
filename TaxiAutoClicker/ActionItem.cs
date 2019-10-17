@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace TaxiAutoClicker
 {
-    public class ActionItem:INotifyPropertyChanged
+    public class ActionItem : INotifyPropertyChanged
     {
         public int Number { get; set; }
         public string Description { get; set; }
